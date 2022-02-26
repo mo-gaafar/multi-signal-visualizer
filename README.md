@@ -12,5 +12,5 @@
 
 - Mohamed Nasser
 - Zeyad Mansour
-- Maryam Khaled
+- Mariam Khaled
 - Abdullah Saeed
