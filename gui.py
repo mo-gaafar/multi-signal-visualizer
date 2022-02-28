@@ -1,7 +1,10 @@
-from PyQt5 import QtWidgets, uic
+from PyQt5 import QtWidgets, uic, QtCore
+from PyQt5 import QtGui, QtCore, QtWidgets
+
 from pyqtgraph import PlotWidget
 import pyqtgraph as pg
 import sys
+
 
 class MainWindow(QtWidgets.QMainWindow):
 
@@ -12,10 +15,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
 
 def main():
-    app = QtWidgets,QtWidgets.QApplication(sys.argv)
+    app = QtWidgets.QApplication(sys.argv)
     main = MainWindow()
     main.show()
     sys.exit(app.exec_())
+
 
 if __name__ == '__main__':
     main()
