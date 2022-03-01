@@ -2,7 +2,7 @@ import string
 from PyQt5 import QtWidgets, uic
 from PyQt5 import QtGui, QtCore, QtWidgets
 from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QTextEdit, QFileDialog, QScrollBar, QComboBox
-from pyparsing import null_debug_action
+#from pyparsing import null_debug_action
 
 from pyqtgraph import PlotWidget
 import pyqtgraph as pg
@@ -62,10 +62,10 @@ def initConnectors(self):
 
     # Zoom Buttons
     self.ZoomIn = self.findChild(QPushButton, "ZoomIn")
-    self.ZoomIn.clicked.connect(self.ZoomIn)
+    self.ZoomIn.clicked.connect(self.ZoomInFunction)
 
     self.ZoomOut = self.findChild(QPushButton, "ZoomOut")
-    self.ZoomOut.clicked.connect(self.ZoomOut)
+    self.ZoomOut.clicked.connect(self.ZoomOutFunction)
 
     # Current Property Channel Updater (on index change note : channel 1 = 0 )
     self.ChannelsMenu = self.findChild(QComboBox, "ChannelsMenu")

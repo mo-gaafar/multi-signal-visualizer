@@ -38,10 +38,10 @@ class MainWindow(QtWidgets.QMainWindow):
         # Step 3 create report with required variables and formatting
         # Step 4 save in selected folder location (step 1)
 
-    def ZoomIn(self):
+    def ZoomInFunction(self):
         null = null
 
-    def ZoomOut(self):
+    def ZoomOutFunction(self):
         null = null
 
     def TogglePause(self):
@@ -52,15 +52,14 @@ class MainWindow(QtWidgets.QMainWindow):
         null = null
         # Line Colour
         self.NewLabel = interfacing.ChannelPropertiesArr[interfacing.CurrentChannelProperty].LineColour
-        #Insert Function to set line colour
+        # Insert Function to set line colour
         # Visibility (IsHidden?)
         self.IsHidden = interfacing.ChannelPropertiesArr[interfacing.CurrentChannelProperty].IsHidden
-        #Insert Function to set line visibility
+        # Insert Function to set line visibility
         # Label
         self.NewLabel = interfacing.ChannelPropertiesArr[interfacing.CurrentChannelProperty].Label
-        #Insert function to set label
+        # Insert function to set label
 
-        
     def UpdateSpectrogramProperty(self):
         null = null  # placeholder
 
