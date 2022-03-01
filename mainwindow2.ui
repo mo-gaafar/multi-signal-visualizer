@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>953</width>
+    <width>954</width>
     <height>784</height>
    </rect>
   </property>
@@ -25,6 +25,10 @@
         <width>16777215</width>
         <height>150</height>
        </size>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(89, 89, 89);</string>
       </property>
       <property name="title">
        <string>Control Center</string>
@@ -56,6 +60,10 @@
            </item>
            <item row="0" column="2">
             <widget class="QComboBox" name="ChannelsMenu">
+             <property name="styleSheet">
+              <string notr="true">background-color: rgb(44, 44, 44);
+selection-background-color: rgb(44, 44, 44);</string>
+             </property>
              <item>
               <property name="text">
                <string>Channel 1</string>
@@ -73,7 +81,7 @@
              </item>
             </widget>
            </item>
-           <item row="2" column="1">
+           <item row="2" column="1" alignment="Qt::AlignRight">
             <widget class="QLabel" name="label_5">
              <property name="text">
               <string>Edit Label:</string>
@@ -365,7 +373,7 @@
          </item>
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_5">
-           <item>
+           <item alignment="Qt::AlignRight">
             <widget class="QLabel" name="label_6">
              <property name="text">
               <string>Spectrogram Theme</string>
@@ -452,6 +460,10 @@
          <height>0</height>
         </size>
        </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(89, 89, 89);
+color: rgb(255, 255, 255);</string>
+       </property>
        <property name="title">
         <string>Channels</string>
        </property>
@@ -474,6 +486,15 @@
         </item>
         <item row="0" column="0">
          <widget class="QScrollBar" name="verticalScrollBar">
+          <property name="maximumSize">
+           <size>
+            <width>5</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">background-color: rgb(255, 255, 255);</string>
+          </property>
           <property name="orientation">
            <enum>Qt::Vertical</enum>
           </property>
@@ -481,6 +502,15 @@
         </item>
         <item row="1" column="1">
          <widget class="QScrollBar" name="horizontalScrollBar">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>5</height>
+           </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">background-color: rgb(255, 255, 255);</string>
+          </property>
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
@@ -489,6 +519,10 @@
        </layout>
       </widget>
       <widget class="QGroupBox" name="groupBox_3">
+       <property name="styleSheet">
+        <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(89, 89, 89);</string>
+       </property>
        <property name="title">
         <string>Spectrogram</string>
        </property>
@@ -508,7 +542,7 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="0">
+          <item row="1" column="0" alignment="Qt::AlignRight">
            <widget class="QLabel" name="Spectro_label">
             <property name="text">
              <string>Select Channel</string>
@@ -517,6 +551,11 @@
           </item>
           <item row="1" column="1">
            <widget class="QComboBox" name="SpectroMenu">
+            <property name="styleSheet">
+             <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(44, 44, 44);
+selection-color: rgb(44, 44, 44);</string>
+            </property>
             <item>
              <property name="text">
               <string>Channel 1</string>
@@ -575,7 +614,7 @@
        </size>
       </property>
       <property name="text">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Multi-Channel Signal Viewer&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt; font-weight:600; color:#ffffff;&quot;&gt;Multi-Channel Signal Viewer&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignCenter</set>
@@ -588,6 +627,10 @@
        <layout class="QHBoxLayout" name="horizontalLayout_3">
         <item>
          <widget class="QPushButton" name="ZoomIn">
+          <property name="styleSheet">
+           <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(89, 89, 89);</string>
+          </property>
           <property name="text">
            <string>Zoom In</string>
           </property>
@@ -595,6 +638,10 @@
         </item>
         <item>
          <widget class="QPushButton" name="ZoomOut">
+          <property name="styleSheet">
+           <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(89, 89, 89);</string>
+          </property>
           <property name="text">
            <string>Zoom Out</string>
           </property>
@@ -638,7 +685,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>953</width>
+     <width>954</width>
      <height>21</height>
     </rect>
    </property>
