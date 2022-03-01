@@ -47,9 +47,22 @@ class MainWindow(QtWidgets.QMainWindow):
     def TogglePause(self):
         null = null
 
-    def CustomizeLine(self):
+    def UpdateLineProperty(self):
         # print(interfacing.ChannelProperties
         null = null
+        # Line Colour
+        self.NewLabel = interfacing.ChannelPropertiesArr[interfacing.CurrentChannelProperty].LineColour
+        #Insert Function to set line colour
+        # Visibility (IsHidden?)
+        self.IsHidden = interfacing.ChannelPropertiesArr[interfacing.CurrentChannelProperty].IsHidden
+        #Insert Function to set line visibility
+        # Label
+        self.NewLabel = interfacing.ChannelPropertiesArr[interfacing.CurrentChannelProperty].Label
+        #Insert function to set label
+
+        
+    def UpdateSpectrogramProperty(self):
+        null = null  # placeholder
 
 
 def main():

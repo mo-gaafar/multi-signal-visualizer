@@ -8,11 +8,15 @@ from pyqtgraph import PlotWidget
 import pyqtgraph as pg
 import sys
 
+from main import MainWindow
+
 # Global Interface Variables
 LabelTextBox = "null"
 
+
 CineSpeed = 1  # from 0.1 to 10x
 
+CurrentChannelProperty = 0
 ChannelPropertiesArr = []
 
 
@@ -22,13 +26,17 @@ class ChannelProperties:
         self.Label = Label
         self.LineColour = LineColour
         self.IsHidden = IsHidden
-        self.Filename = Filename
+        #self.Filename = Filename
 
 
-for ForCount in range(2):
+for ForCount in range(3):
     ChannelPropertiesArr.append(ChannelProperties)
     print(ChannelPropertiesArr[ForCount])
 # Global plot channel object that contains related attributes
+
+
+def printbtengan():
+    print("brengan")
 
 
 class SpectrogramProperties:
@@ -53,8 +61,22 @@ def initConnectors(self):
     self.ExportBtn.clicked.connect(self.ExportPDF)
 
     # Zoom Buttons
-    # self.ZoomIn = self.findChild(QPushButton, "ZoomIn")
-    # self.ZoomIn.clicked.connect(self.ZoomIn)
+    self.ZoomIn = self.findChild(QPushButton, "ZoomIn")
+    self.ZoomIn.clicked.connect(self.ZoomIn)
 
-    # self.ZoomOut = self.findChild(QPushButton, "ZoomOut")
-    # self.ZoomOut.clicked.connect(self.ZoomOut)
+    self.ZoomOut = self.findChild(QPushButton, "ZoomOut")
+    self.ZoomOut.clicked.connect(self.ZoomOut)
+
+    # Current Property Channel Updater (on index change note : channel 1 = 0 )
+    self.ChannelsMenu = self.findChild(QComboBox, "ChannelsMenu")
+    # self.ChannelsMenu.currentIndexChanged.()
+
+    # Step 1: update CurrentChannelProperty variable with ChannelsMenu CurrentIndex
+    # Step 2:
+    # Step 3:
+
+    self.ChannelsMenu.currentIndexChanged.connect(lambda: printbtengan())
+
+    # Select Signal Colour Button
+    self.SignalColour = self.findChild(QPushButton, "SignalColour")
+    self.SignalColour.clicked.connect(lambda: printbtengan())
