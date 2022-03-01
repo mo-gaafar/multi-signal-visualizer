@@ -1,3 +1,6 @@
+from msilib.schema import Directory
+from tkinter import Label, dialog
+from tkinter.tix import DirSelectDialog
 from PyQt5 import QtWidgets, uic
 from PyQt5 import QtGui, QtCore, QtWidgets
 from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QTextEdit, QFileDialog, QScrollBar, QComboBox
@@ -11,6 +14,7 @@ import interfacing  # local module
 
 class MainWindow(QtWidgets.QMainWindow):
 
+    # Initialization function
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
         uic.loadUi('mainwindow2.ui', self)
@@ -22,14 +26,30 @@ class MainWindow(QtWidgets.QMainWindow):
         print(self.filename)
 
     def ExportPDF(self):
+        # Folder Dialog (failed attempt)
+        QFileDialog.setFileMode(self, Directory)
+        QFileDialog.setOption(self, DirSelectDialog)
         self.filename = QFileDialog.getOpenFileName()
         print(self.filename)
-        # @ABDULLAH etfaddal hena
+        # @Abdullahsaeed2 etfaddal hena
 
         # Step 1 choose folder location
         # Step 2 create snapshot of plotter
         # Step 3 create report with required variables and formatting
         # Step 4 save in selected folder location (step 1)
+
+    def ZoomIn(self):
+        null = null
+
+    def ZoomOut(self):
+        null = null
+
+    def TogglePause(self):
+        null = null
+
+    def CustomizeLine(self):
+        # print(interfacing.ChannelProperties
+        null = null
 
 
 def main():
