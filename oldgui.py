@@ -11,7 +11,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
 
-        uic.loadUi('mainwindow.ui', self)
+        uic.loadUi('mainwindow2.ui', self)
 
 
 def main():
