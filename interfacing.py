@@ -8,19 +8,23 @@ from pyqtgraph import PlotWidget
 import pyqtgraph as pg
 import sys
 
-from main import MainWindow
+from main import DebugMode, MainWindow
 
 # Global Interface Variables
 LabelTextBox = "null"
 
+SpectroThemesArray = [] #TODO: add themes here somehow? create theme object or dictionary?
 
 CineSpeed = 1  # from 0.1 to 10x
 
+#Should be updated from combobox (on change)
 SignalSelectedIndex = 0
-SignalLinePropertiesArr = []
+SpectroSelectedIndex = 0 
+
+ChannelLineArr = []
 
 
-class SignalLineProperties:
+class ChannelLine:
 
     def __init__(self, Label="Unlabeled", LineColour=0xFFFF00, IsHidden=True, Filename="null"):
         self.Label = Label
@@ -31,8 +35,8 @@ class SignalLineProperties:
 
 def initArrays(self):
     for Index in range(3):
-        SignalLinePropertiesArr.append(SignalLineProperties)
-        print(SignalLinePropertiesArr[Index])
+        ChannelLineArr.append(ChannelLine)
+        print(ChannelLineArr[Index])
     # Global plot channel object that contains related attributes
 
 
@@ -40,13 +44,30 @@ def printbtengan():
     print("brengan")
 
 
-class SpectrogramProperties:
+class ChannelSpectrogram:
     def __init__(self, FreqRangeMax=1000, FreqRangeMin=0, SelectedChannel=1, SelectedTheme="Default"):
         self.FreqRangeMax = FreqRangeMax
         self.FreqRangeMin = FreqRangeMin
-
-        self.SelectedChannel = SelectedChannel
         self.SelectedTheme = SelectedTheme
+    
+    def UpdateFreqRange(Input, MinOrMax):
+        if MinOrMax == "Min":
+            if DebugMode == True:
+                printbtengan()
+        #Updates the object variable
+        #Update the attribute in the actual plot
+        if MinOrMax == "Max":
+            if DebugMode == True:
+                printbtengan()
+        #Updates the object variable
+        #Update the attribute in the actual plot
+
+    def UpdateSelectedTheme(ThemeIndex):
+        if DebugMode == True:
+            printbtengan()
+        #Updates the object variable
+        #Update the attribute in the actual plot
+
 
 # Initializes all event triggers
 
@@ -76,12 +97,13 @@ def initConnectors(self):
     self.ChannelsMenu = self.findChild(QComboBox, "ChannelsMenu")
     # self.ChannelsMenu.currentIndexChanged.()
 
-    # Step 1: update SignalSelectedIndex variable with ChannelsMenu CurrentIndex
-    # Step 2:
-    # Step 3:
+    # update SignalSelectedIndex variable with ChannelsMenu CurrentIndex
 
-    self.ChannelsMenu.currentIndexChanged.connect(lambda: printbtengan())
+    self.ChannelsMenu.currentIndexChanged.connect(lambda: printbtengan()) #on index change
 
     # Select Signal Colour Button
     self.SignalColour = self.findChild(QPushButton, "SignalColour")
     self.SignalColour.clicked.connect(lambda: printbtengan())
+
+    #Plot 
+

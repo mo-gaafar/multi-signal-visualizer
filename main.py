@@ -14,10 +14,12 @@ from random import randint
 
 import interfacing  # local module
 
+DebugMode = True #Debug mode enables printing
+
 
 class MainWindow(QtWidgets.QMainWindow):
 
-    # Initialization function
+    # Mainwindow constructor
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
         uic.loadUi('mainwindow2.ui', self)
@@ -82,17 +84,17 @@ class MainWindow(QtWidgets.QMainWindow):
         # print(interfacing.ChannelProperties
         null = null
         # Line Colour
-        self.NewLabel = interfacing.SignalLinePropertiesArr[interfacing.SignalSelectedIndex].LineColour
+        self.NewLabel = interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].LineColour
         # Insert Function to set line colour
         # Visibility (IsHidden?)
-        self.IsHidden = interfacing.SignalLinePropertiesArr[interfacing.SignalSelectedIndex].IsHidden
+        self.IsHidden = interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].IsHidden
         # Insert Function to set line visibility
         # Label
-        self.NewLabel = interfacing.SignalLinePropertiesArr[interfacing.SignalSelectedIndex].Label
+        self.NewLabel = interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].Label
         # Insert function to set label
 
     def UpdateSpectrogramProperty(self):
-        null = null  # placeholder
+        interfacing.printbtengan()  # placeholder
 
 
 def main():
