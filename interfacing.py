@@ -45,15 +45,23 @@ class ChannelLine:
         # self.LineColour =
         #self.LineColour = "NONE"
         # print(self.LineColour)
+        PrevColour = self.LineColour
         self.LineColour = MainWindow.SelectSignalColour(self)
+        if (self.LineColour == "#000000"):                      # Keeps previous colour if user cancels/selects black
+            self.LineColour = PrevColour
+
         if DebugMode == True:
             print(str(self.LineColour) + " set as colour for channel: " +
                   str(SignalSelectedIndex))
 
+    # LineColour Getter
+    def GetColour(self):
+        return self.LineColour
+
 
 def initArrays(self):
     for Index in range(3):
-        ChannelLineArr.append(ChannelLine)
+        ChannelLineArr.append(ChannelLine())
         print(ChannelLineArr[Index])
     # Global plot channel object that contains related attributes
 
@@ -110,7 +118,7 @@ def initConnectors(self):
     # Signal Colour Button
     self.SignalColour = self.findChild(QPushButton, "SignalColour")
     self.SignalColour.clicked.connect(
-        lambda: ChannelLineArr[SignalSelectedIndex].UpdateColour(self))
+        lambda: ChannelLineArr[SignalSelectedIndex].UpdateColour())
 
     # Updates global variable (SignalSelectedIndex) on combobox change
     self.ChannelsMenu = self.findChild(QComboBox, "ChannelsMenu")
