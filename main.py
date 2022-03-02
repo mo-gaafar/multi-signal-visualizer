@@ -53,7 +53,7 @@ class MainWindow(QtWidgets.QMainWindow):
         pen = pg.mkPen(color=(255, 255, 255))
         self.data_line = self.Plot.plot(self.x, self.y, pen=pen)
         self.timer = QtCore.QTimer()
-        self.timer.setInterval(50)
+        self.timer.setInterval(150)
         self.timer.timeout.connect(self.update_plot_data)
         self.timer.start()
 
@@ -62,11 +62,8 @@ class MainWindow(QtWidgets.QMainWindow):
         # Add a new value 1 higher than the last.
         self.x.append(self.x[-1] + 1)
 
-        self.y = self.y[1:]  # Remove the first
-        self.y.append(randint(-100, 100))  # Add a new random value
-        self.data_line.setData(self.x, self.y, pen = interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].GetColour())
-
-
+        self.data_line.setData(
+            self.x, self.y, pen=interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].GetColour())
 
     def ExportPDF(self):
         # Folder Dialog (failed attempt)
