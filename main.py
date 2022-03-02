@@ -14,7 +14,7 @@ from random import randint
 
 import interfacing  # local module
 
-DebugMode = True #Debug mode enables printing
+DebugMode = True  # Debug mode enables printing
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -24,31 +24,31 @@ class MainWindow(QtWidgets.QMainWindow):
         super(MainWindow, self).__init__(*args, **kwargs)
         uic.loadUi('mainwindow2.ui', self)
 
-        #Initialization functions
+        # Initialization functions
         interfacing.initConnectors(self)
         interfacing.initArrays(self)
 
-#------------------------------------------------------------------------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------------------------------------------------------------------------------
         self.x = list(range(100))  # 100 time points
-        self.y = [randint(0,100) for _ in range(100)]
+        self.y = [randint(0, 100) for _ in range(100)]
         pen = pg.mkPen(color=(255, 255, 255))
-        self.data_line =  self.Plot.plot(self.x, self.y, pen=pen)
+        self.data_line = self.Plot.plot(self.x, self.y, pen=pen)
         self.timer = QtCore.QTimer()
         self.timer.setInterval(50)
         self.timer.timeout.connect(self.update_plot_data)
         self.timer.start()
-                                                                                    # RANDOM REAL TIME EXAMPLE
+        # RANDOM REAL TIME EXAMPLE
+
     def update_plot_data(self):
         self.x = self.x[1:]  # Remove the first y element.
-        self.x.append(self.x[-1] + 1)  # Add a new value 1 higher than the last.
+        # Add a new value 1 higher than the last.
+        self.x.append(self.x[-1] + 1)
 
         self.y = self.y[1:]  # Remove the first
-        self.y.append(randint(-100,100))  # Add a new random value.
+        self.y.append(randint(-100, 100))  # Add a new random value.
 
         self.data_line.setData(self.x, self.y)
-#--------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-       
+# --------------------------------------------------------------------------------------------------------------------------------------------------------------
 
     def Browse(self):
         self.filename = QFileDialog.getOpenFileName()
@@ -67,22 +67,26 @@ class MainWindow(QtWidgets.QMainWindow):
         # Step 3 create report with required variables and formatting
         # Step 4 save in selected folder location (step 1)
 
-    def SelectSignalColour(self):                               # OPENS COLOUR DIALOG WHEN BUTTON IS PRESSED
-        self.SignalColour = QColorDialog.getColor()
-        print(self.SignalColour)
+    # OPENS COLOUR DIALOG WHEN BUTTON IS PRESSED
+    def SelectSignalColour(self):
+        self.SignalColour = QColorDialog.getColor().name()
+        return self.SignalColour
 
     def ZoomInFunction(self):
-        interfacing.printbtengan()
+        if DebugMode == True:
+            interfacing.printbtengan()
 
     def ZoomOutFunction(self):
-        interfacing.printbtengan()
+        if DebugMode == True:
+            interfacing.printbtengan()
 
     def TogglePause(self):
-        interfacing.printbtengan()
+        if DebugMode == True:
+            interfacing.printbtengan()
 
     def UpdateLineProperty(self):
-        # print(interfacing.ChannelProperties
-        null = null
+        if DebugMode == True:
+            interfacing.printbtengan()
         # Line Colour
         self.NewLabel = interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].LineColour
         # Insert Function to set line colour
@@ -94,7 +98,8 @@ class MainWindow(QtWidgets.QMainWindow):
         # Insert function to set label
 
     def UpdateSpectrogramProperty(self):
-        interfacing.printbtengan()  # placeholder
+        if DebugMode == True:
+            interfacing.printbtengan()
 
 
 def main():

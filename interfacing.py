@@ -13,13 +13,22 @@ from main import DebugMode, MainWindow
 # Global Interface Variables
 LabelTextBox = "null"
 
-SpectroThemesArray = [] #TODO: add themes here somehow? create theme object or dictionary?
+# TODO: add themes here somehow? create theme object or dictionary?
+SpectroThemesArray = []
 
 CineSpeed = 1  # from 0.1 to 10x
 
-#Should be updated from combobox (on change)
+# Should be updated from combobox (on change)
 SignalSelectedIndex = 0
-SpectroSelectedIndex = 0 
+SpectroSelectedIndex = 0
+
+
+def SetSignalIndex(Input):
+    global SignalSelectedIndex
+    SignalSelectedIndex = Input
+    if DebugMode == True:
+        print(SignalSelectedIndex)
+
 
 ChannelLineArr = []
 
@@ -31,6 +40,15 @@ class ChannelLine:
         self.LineColour = LineColour
         self.IsHidden = IsHidden
         #self.Filename = Filename
+
+    def UpdateColour(self):
+        # self.LineColour =
+        #self.LineColour = "NONE"
+        # print(self.LineColour)
+        self.LineColour = MainWindow.SelectSignalColour(self)
+        if DebugMode == True:
+            print(str(self.LineColour) + " set as colour for channel: " +
+                  str(SignalSelectedIndex))
 
 
 def initArrays(self):
@@ -49,24 +67,24 @@ class ChannelSpectrogram:
         self.FreqRangeMax = FreqRangeMax
         self.FreqRangeMin = FreqRangeMin
         self.SelectedTheme = SelectedTheme
-    
+
     def UpdateFreqRange(Input, MinOrMax):
         if MinOrMax == "Min":
             if DebugMode == True:
                 printbtengan()
-        #Updates the object variable
-        #Update the attribute in the actual plot
+        # Updates the object variable
+        # Update the attribute in the actual plot
         if MinOrMax == "Max":
             if DebugMode == True:
                 printbtengan()
-        #Updates the object variable
-        #Update the attribute in the actual plot
+        # Updates the object variable
+        # Update the attribute in the actual plot
 
     def UpdateSelectedTheme(ThemeIndex):
         if DebugMode == True:
             printbtengan()
-        #Updates the object variable
-        #Update the attribute in the actual plot
+        # Updates the object variable
+        # Update the attribute in the actual plot
 
 
 # Initializes all event triggers
@@ -88,22 +106,19 @@ def initConnectors(self):
 
     self.ZoomOut = self.findChild(QPushButton, "ZoomOut")
     self.ZoomOut.clicked.connect(self.ZoomOutFunction)
-    
+
     # Signal Colour Button
     self.SignalColour = self.findChild(QPushButton, "SignalColour")
-    self.SignalColour.clicked.connect(self.SelectSignalColour)
+    self.SignalColour.clicked.connect(
+        lambda: ChannelLineArr[SignalSelectedIndex].UpdateColour(self))
 
-    # Current Property Channel Updater (on index change note : channel 1 = 0 )
+    # Updates global variable (SignalSelectedIndex) on combobox change
     self.ChannelsMenu = self.findChild(QComboBox, "ChannelsMenu")
-    # self.ChannelsMenu.currentIndexChanged.()
+    self.ChannelsMenu.currentIndexChanged.connect(lambda: SetSignalIndex(
+        self.ChannelsMenu.currentIndex()))  # on index change
 
-    # update SignalSelectedIndex variable with ChannelsMenu CurrentIndex
+    # # Select Signal Colour Button
+    # self.SignalColour = self.findChild(QPushButton, "SignalColour")
+    # self.SignalColour.clicked.connect(lambda: printbtengan())
 
-    self.ChannelsMenu.currentIndexChanged.connect(lambda: printbtengan()) #on index change
-
-    # Select Signal Colour Button
-    self.SignalColour = self.findChild(QPushButton, "SignalColour")
-    self.SignalColour.clicked.connect(lambda: printbtengan())
-
-    #Plot 
-
+    # Plot
