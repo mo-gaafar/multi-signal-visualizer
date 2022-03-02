@@ -63,9 +63,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.x.append(self.x[-1] + 1)
 
         self.y = self.y[1:]  # Remove the first
-        self.y.append(randint(-100, 100))  # Add a new random value.
+        self.y.append(randint(-100, 100))  # Add a new random value
+        self.data_line.setData(self.x, self.y, pen = interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].GetColour())
 
-        self.data_line.setData(self.x, self.y)
+
 
     def ExportPDF(self):
         # Folder Dialog (failed attempt)
