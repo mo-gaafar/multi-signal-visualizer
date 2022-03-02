@@ -8,19 +8,32 @@ from pyqtgraph import PlotWidget
 import pyqtgraph as pg
 import sys
 
-from main import MainWindow
+from main import DebugMode, MainWindow
 
 # Global Interface Variables
 LabelTextBox = "null"
 
+# TODO: add themes here somehow? create theme object or dictionary?
+SpectroThemesArray = []
 
 CineSpeed = 1  # from 0.1 to 10x
 
-CurrentChannelProperty = 0
-ChannelPropertiesArr = []
+# Should be updated from combobox (on change)
+SignalSelectedIndex = 0
+SpectroSelectedIndex = 0
 
 
-class ChannelProperties:
+def SetSignalIndex(Input):
+    global SignalSelectedIndex
+    SignalSelectedIndex = Input
+    if DebugMode == True:
+        print(SignalSelectedIndex)
+
+
+ChannelLineArr = []
+
+
+class ChannelLine:
 
     def __init__(self, Label="Unlabeled", LineColour=0xFFFF00, IsHidden=True, Filename="null"):
         self.Label = Label
@@ -28,24 +41,51 @@ class ChannelProperties:
         self.IsHidden = IsHidden
         #self.Filename = Filename
 
+    def UpdateColour(self):
+        # self.LineColour =
+        #self.LineColour = "NONE"
+        # print(self.LineColour)
+        self.LineColour = MainWindow.SelectSignalColour(self)
+        if DebugMode == True:
+            print(str(self.LineColour) + " set as colour for channel: " +
+                  str(SignalSelectedIndex))
 
-for ForCount in range(3):
-    ChannelPropertiesArr.append(ChannelProperties)
-    print(ChannelPropertiesArr[ForCount])
-# Global plot channel object that contains related attributes
+
+def initArrays(self):
+    for Index in range(3):
+        ChannelLineArr.append(ChannelLine)
+        print(ChannelLineArr[Index])
+    # Global plot channel object that contains related attributes
 
 
 def printbtengan():
     print("brengan")
 
 
-class SpectrogramProperties:
+class ChannelSpectrogram:
     def __init__(self, FreqRangeMax=1000, FreqRangeMin=0, SelectedChannel=1, SelectedTheme="Default"):
         self.FreqRangeMax = FreqRangeMax
         self.FreqRangeMin = FreqRangeMin
-
-        self.SelectedChannel = SelectedChannel
         self.SelectedTheme = SelectedTheme
+
+    def UpdateFreqRange(Input, MinOrMax):
+        if MinOrMax == "Min":
+            if DebugMode == True:
+                printbtengan()
+        # Updates the object variable
+        # Update the attribute in the actual plot
+        if MinOrMax == "Max":
+            if DebugMode == True:
+                printbtengan()
+        # Updates the object variable
+        # Update the attribute in the actual plot
+
+    def UpdateSelectedTheme(ThemeIndex):
+        if DebugMode == True:
+            printbtengan()
+        # Updates the object variable
+        # Update the attribute in the actual plot
+
 
 # Initializes all event triggers
 
@@ -67,16 +107,18 @@ def initConnectors(self):
     self.ZoomOut = self.findChild(QPushButton, "ZoomOut")
     self.ZoomOut.clicked.connect(self.ZoomOutFunction)
 
-    # Current Property Channel Updater (on index change note : channel 1 = 0 )
-    self.ChannelsMenu = self.findChild(QComboBox, "ChannelsMenu")
-    # self.ChannelsMenu.currentIndexChanged.()
-
-    # Step 1: update CurrentChannelProperty variable with ChannelsMenu CurrentIndex
-    # Step 2:
-    # Step 3:
-
-    self.ChannelsMenu.currentIndexChanged.connect(lambda: printbtengan())
-
-    # Select Signal Colour Button
+    # Signal Colour Button
     self.SignalColour = self.findChild(QPushButton, "SignalColour")
-    self.SignalColour.clicked.connect(lambda: printbtengan())
+    self.SignalColour.clicked.connect(
+        lambda: ChannelLineArr[SignalSelectedIndex].UpdateColour(self))
+
+    # Updates global variable (SignalSelectedIndex) on combobox change
+    self.ChannelsMenu = self.findChild(QComboBox, "ChannelsMenu")
+    self.ChannelsMenu.currentIndexChanged.connect(lambda: SetSignalIndex(
+        self.ChannelsMenu.currentIndex()))  # on index change
+
+    # # Select Signal Colour Button
+    # self.SignalColour = self.findChild(QPushButton, "SignalColour")
+    # self.SignalColour.clicked.connect(lambda: printbtengan())
+
+    # Plot
