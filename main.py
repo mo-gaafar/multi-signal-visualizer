@@ -22,6 +22,9 @@ class MainWindow(QtWidgets.QMainWindow):
         super(MainWindow, self).__init__(*args, **kwargs)
         uic.loadUi('mainwindow2.ui', self)
 
+        #Initialization functions
+        interfacing.initConnectors(self)
+        interfacing.initArrays(self)
 
 #------------------------------------------------------------------------------------------------------------------------------------------------------------
         self.x = list(range(100))  # 100 time points
@@ -43,7 +46,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.data_line.setData(self.x, self.y)
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-        interfacing.initConnectors(self)
+       
 
     def Browse(self):
         self.filename = QFileDialog.getOpenFileName()
@@ -67,25 +70,25 @@ class MainWindow(QtWidgets.QMainWindow):
         print(self.SignalColour)
 
     def ZoomInFunction(self):
-        null = null
+        interfacing.printbtengan()
 
     def ZoomOutFunction(self):
-        null = null
+        interfacing.printbtengan()
 
     def TogglePause(self):
-        null = null
+        interfacing.printbtengan()
 
     def UpdateLineProperty(self):
         # print(interfacing.ChannelProperties
         null = null
         # Line Colour
-        self.NewLabel = interfacing.ChannelPropertiesArr[interfacing.CurrentChannelProperty].LineColour
+        self.NewLabel = interfacing.SignalLinePropertiesArr[interfacing.SignalSelectedIndex].LineColour
         # Insert Function to set line colour
         # Visibility (IsHidden?)
-        self.IsHidden = interfacing.ChannelPropertiesArr[interfacing.CurrentChannelProperty].IsHidden
+        self.IsHidden = interfacing.SignalLinePropertiesArr[interfacing.SignalSelectedIndex].IsHidden
         # Insert Function to set line visibility
         # Label
-        self.NewLabel = interfacing.ChannelPropertiesArr[interfacing.CurrentChannelProperty].Label
+        self.NewLabel = interfacing.SignalLinePropertiesArr[interfacing.SignalSelectedIndex].Label
         # Insert function to set label
 
     def UpdateSpectrogramProperty(self):

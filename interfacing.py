@@ -16,11 +16,11 @@ LabelTextBox = "null"
 
 CineSpeed = 1  # from 0.1 to 10x
 
-CurrentChannelProperty = 0
-ChannelPropertiesArr = []
+SignalSelectedIndex = 0
+SignalLinePropertiesArr = []
 
 
-class ChannelProperties:
+class SignalLineProperties:
 
     def __init__(self, Label="Unlabeled", LineColour=0xFFFF00, IsHidden=True, Filename="null"):
         self.Label = Label
@@ -29,10 +29,11 @@ class ChannelProperties:
         #self.Filename = Filename
 
 
-for ForCount in range(3):
-    ChannelPropertiesArr.append(ChannelProperties)
-    print(ChannelPropertiesArr[ForCount])
-# Global plot channel object that contains related attributes
+def initArrays(self):
+    for Index in range(3):
+        SignalLinePropertiesArr.append(SignalLineProperties)
+        print(SignalLinePropertiesArr[Index])
+    # Global plot channel object that contains related attributes
 
 
 def printbtengan():
@@ -75,7 +76,7 @@ def initConnectors(self):
     self.ChannelsMenu = self.findChild(QComboBox, "ChannelsMenu")
     # self.ChannelsMenu.currentIndexChanged.()
 
-    # Step 1: update CurrentChannelProperty variable with ChannelsMenu CurrentIndex
+    # Step 1: update SignalSelectedIndex variable with ChannelsMenu CurrentIndex
     # Step 2:
     # Step 3:
 
