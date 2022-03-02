@@ -66,6 +66,10 @@ def initConnectors(self):
 
     self.ZoomOut = self.findChild(QPushButton, "ZoomOut")
     self.ZoomOut.clicked.connect(self.ZoomOutFunction)
+    
+    # Signal Colour Button
+    self.SignalColour = self.findChild(QPushButton, "SignalColour")
+    self.SignalColour.clicked.connect(self.SelectSignalColour)
 
     # Current Property Channel Updater (on index change note : channel 1 = 0 )
     self.ChannelsMenu = self.findChild(QComboBox, "ChannelsMenu")
