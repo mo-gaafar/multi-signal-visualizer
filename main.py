@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QTextEdit, Q
 from pyqtgraph import PlotWidget
 import pyqtgraph as pg
 import sys
-
+import csv
 import os
 from random import randint
 
@@ -28,16 +28,34 @@ class MainWindow(QtWidgets.QMainWindow):
         interfacing.initConnectors(self)
         interfacing.initArrays(self)
 
-# ------------------------------------------------------------------------------------------------------------------------------------------------------------
-        self.x = list(range(100))  # 100 time points
-        self.y = [randint(0, 100) for _ in range(100)]
+        self.amplitude = []
+        self.time = []
+        self.filename = ['']
+
+    def Browse(self):
+        self.filename = QFileDialog.getOpenFileName(
+            None, 'open the signal file', './', filter="Raw Data(*.csv *.txt *.xls)")
+        path = self.filename[0]
+        print("Selected path: " + path)
+        self.openfile(path)
+
+    def openfile(self, path: str):  # to read the content of the
+        with open(path, 'r') as csvFile:    # 'r' its a mode for reading and writing
+            csvReader = csv.reader(csvFile, delimiter=',')
+            for line in csvReader:
+                self.amplitude.append(float(line[1]))
+                self.time.append(float(line[0]))
+        self.plot_data()
+
+    def plot_data(self):
+        self.x = self.time
+        self.y = self.amplitude
         pen = pg.mkPen(color=(255, 255, 255))
         self.data_line = self.Plot.plot(self.x, self.y, pen=pen)
         self.timer = QtCore.QTimer()
         self.timer.setInterval(50)
         self.timer.timeout.connect(self.update_plot_data)
         self.timer.start()
-        # RANDOM REAL TIME EXAMPLE
 
     def update_plot_data(self):
         self.x = self.x[1:]  # Remove the first y element.
@@ -46,13 +64,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.y = self.y[1:]  # Remove the first
         self.y.append(randint(-100, 100))  # Add a new random value
-
         self.data_line.setData(self.x, self.y, pen = interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].GetColour())
-# --------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-    def Browse(self):
-        self.filename = QFileDialog.getOpenFileName()
-        print(self.filename)
+
 
     def ExportPDF(self):
         # Folder Dialog (failed attempt)
