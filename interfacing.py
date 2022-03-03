@@ -1,7 +1,11 @@
+
+#THIS FILE CONTAINS FUNCTION DEFENITIONS AND OBJECTS USED IN MAIN
+#IT WILL BE SPLIT INTO MORE LOGICAL MODULES IN THE FUTURE
+
 import string
 from PyQt5 import QtWidgets, uic
 from PyQt5 import QtGui, QtCore, QtWidgets
-from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QTextEdit, QFileDialog, QScrollBar, QComboBox
+from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QTextEdit, QFileDialog, QScrollBar, QComboBox, QCheckBox
 #from pyparsing import null_debug_action
 
 from pyqtgraph import PlotWidget
@@ -23,11 +27,16 @@ SignalSelectedIndex = 0
 SpectroSelectedIndex = 0
 
 
-def SetSignalIndex(Input):
-    global SignalSelectedIndex
-    SignalSelectedIndex = Input
-    if DebugMode == True:
-        print(SignalSelectedIndex)
+def SetSelectedIndex(Input, Selector):
+    if Selector == "Signal":
+        global SignalSelectedIndex
+        SignalSelectedIndex = Input
+        printDebug("Signal dropdown: " + str(SignalSelectedIndex))
+    if Selector == "Spectro":
+        global SpectroSelectedIndex
+        SpectroSelectedIndex = Input
+        printDebug("Spectrogram dropdown: " + str(SpectroSelectedIndex))
+
 
 
 ChannelLineArr = []
@@ -50,13 +59,15 @@ class ChannelLine:
         if (self.LineColour == "#000000"):                      # Keeps previous colour if user cancels/selects black
             self.LineColour = PrevColour
 
-        if DebugMode == True:
-            print(str(self.LineColour) + " set as colour for channel: " +
+        printDebug(str(self.LineColour) + " set as colour for channel: " +
                   str(SignalSelectedIndex))
 
     # LineColour Getter
     def GetColour(self):
         return self.LineColour
+
+    def UpdateHide(self):
+        printDebug("Updated IsHidden")
 
 
 def initArrays(self):
@@ -65,9 +76,18 @@ def initArrays(self):
         print(ChannelLineArr[Index])
     # Global plot channel object that contains related attributes
 
+class PlotterWindow:
+    def __init__(self, YAxisRange = (0,1), XAxisRange = (-1,1) , CineSpeed = 1 ):
+        self.YAxisRange = YAxisRange #Tuple containing min/max ranges
+        self.XAxisRange = XAxisRange 
 
-def printbtengan():
-    print("brengan")
+        self.CineSpeed = CineSpeed
+        
+
+
+def printDebug(Value): #Enabled when global debug mode is on
+    if DebugMode == 1:
+        print(Value)
 
 
 class ChannelSpectrogram:
@@ -79,18 +99,18 @@ class ChannelSpectrogram:
     def UpdateFreqRange(Input, MinOrMax):
         if MinOrMax == "Min":
             if DebugMode == True:
-                printbtengan()
+                printDebug("Brengan")
         # Updates the object variable
         # Update the attribute in the actual plot
         if MinOrMax == "Max":
             if DebugMode == True:
-                printbtengan()
+                printDebug("Brengan")
         # Updates the object variable
         # Update the attribute in the actual plot
 
     def UpdateSelectedTheme(ThemeIndex):
         if DebugMode == True:
-            printbtengan()
+            printDebug("Brengan")
         # Updates the object variable
         # Update the attribute in the actual plot
 
@@ -120,13 +140,17 @@ def initConnectors(self):
     self.SignalColour.clicked.connect(
         lambda: ChannelLineArr[SignalSelectedIndex].UpdateColour())
 
+    self.ShowHide = self.findChild(QCheckBox, "ShowHide")
+    self.ShowHide.stateChanged.connect(
+        lambda: ChannelLineArr[SignalSelectedIndex].UpdateHide())
+
     # Updates global variable (SignalSelectedIndex) on combobox change
     self.ChannelsMenu = self.findChild(QComboBox, "ChannelsMenu")
-    self.ChannelsMenu.currentIndexChanged.connect(lambda: SetSignalIndex(
-        self.ChannelsMenu.currentIndex()))  # on index change
+    self.ChannelsMenu.currentIndexChanged.connect(lambda: SetSelectedIndex(
+        self.ChannelsMenu.currentIndex(),"Signal"))  # on index change
 
-    # # Select Signal Colour Button
-    # self.SignalColour = self.findChild(QPushButton, "SignalColour")
-    # self.SignalColour.clicked.connect(lambda: printbtengan())
-
+    # Updates SpectroSelectedIndex on change
+    self.SpectroMenu = self.findChild(QComboBox, "SpectroMenu")
+    self.SpectroMenu.currentIndexChanged.connect(lambda: SetSelectedIndex(
+    self.SpectroMenu.currentIndex(), "Spectro")) 
     # Plot
