@@ -31,13 +31,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.amplitude = []
         self.time = []
         self.filename = ['']
-
-    def Browse(self):
-        self.filename = QFileDialog.getOpenFileName(
-            None, 'open the signal file', './', filter="Raw Data(*.csv *.txt *.xls)")
-        path = self.filename[0]
-        print("Selected path: " + path)
-        self.openfile(path)
+        self.pointsToAppend= 0
 
     def openfile(self, path: str):  # to read the content of the
         with open(path, 'r') as csvFile:    # 'r' its a mode for reading and writing
@@ -48,22 +42,47 @@ class MainWindow(QtWidgets.QMainWindow):
         self.plot_data()
 
     def plot_data(self):
-        self.x = self.time
-        self.y = self.amplitude
         pen = pg.mkPen(color=(255, 255, 255))
-        self.data_line = self.Plot.plot(self.x, self.y, pen=pen)
+        self.data_line = self.Plot.plot(self.time, self.amplitude, pen=pen)
+        print('PASS1')
+        self.Plot.plotItem.setLimits(xMin=min(self.time), xMax=max(self.time), yMin=min(self.amplitude), yMax=max(self.amplitude)) #limit bata3 al axis ali 3andi
+        print('PASS2')
+        
+        self.pointsToAppend= 0
         self.timer = QtCore.QTimer()
-        self.timer.setInterval(150)
+        self.timer.setInterval(20)
         self.timer.timeout.connect(self.update_plot_data)
         self.timer.start()
+        print('PASS3')
 
     def update_plot_data(self):
-        self.x = self.x[1:]  # Remove the first y element.
-        # Add a new value 1 higher than the last.
-        self.x.append(self.x[-1] + 1)
 
-        self.data_line.setData(
-            self.x, self.y, pen=interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].GetColour())
+        self.x = self.time[:self.pointsToAppend]
+        self.y = self.amplitude[:self.pointsToAppend]
+        self.pointsToAppend += 10
+        if self.pointsToAppend > len(self.time):
+            self.timers.stop()
+            
+        print(self.pointsToAppend)
+        print(len(self.time))
+        print(self.time[self.pointsToAppend])
+        print('nultgfuktgcukl')
+        print(self.time[:self.pointsToAppend])
+
+        print('PASS4')
+        #if self.time[self.pointsToAppend] > 1:   #1 because this where our axis stops at at the begings to evry time we need to update the axis inorder for it to plot dynamiclly
+           # self.Plot.setLimits(xMax=max(self.x, default=0))
+        print('PASS5')
+        self.Plot.plotItem.setXRange(max(self.x, default=0)-1.0, max(self.x, default=0))
+        print('PASS6')
+        self.data_line.setData(self.x, self.y, pen=interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].GetColour())
+
+    def Browse(self):
+        self.filename = QFileDialog.getOpenFileName(
+            None, 'open the signal file', './', filter="Raw Data(*.csv *.txt *.xls)")
+        path = self.filename[0]
+        print("Selected path: " + path)
+        self.openfile(path)
 
     def ExportPDF(self):
         # Folder Dialog (failed attempt)
