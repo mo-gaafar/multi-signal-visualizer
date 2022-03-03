@@ -8,6 +8,20 @@ from pyqtgraph import PlotWidget
 import pyqtgraph as pg
 import sys
 
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as Canvas
+import scipy.io
+from scipy import signal
+import numpy as np
+import matplotlib.pyplot as plt
+import time
+plt.rcParams['axes.facecolor']='black'
+plt.rc('axes',edgecolor='w')
+plt.rc('xtick',color='w')
+plt.rc('ytick',color='w')
+plt.rcParams['savefig.facecolor']='black'
+plt.rcParams["figure.autolayout"] = True
+
 from main import DebugMode, MainWindow
 
 # Global Interface Variables
@@ -130,3 +144,11 @@ def initConnectors(self):
     # self.SignalColour.clicked.connect(lambda: printbtengan())
 
     # Plot
+
+
+def CreateSpectrogramFigure(self):
+        self.figure  = plt.figure()
+        self.figure.patch.set_facecolor('black')
+        self.axes = self.figure.add_subplot()
+        self.Spectrogram = Canvas(self.figure)
+        self.SpectrogramBox_2.addWidget(self.Spectrogram)
