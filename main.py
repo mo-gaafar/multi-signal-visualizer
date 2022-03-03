@@ -12,6 +12,14 @@ import csv
 import os
 from random import randint
 
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as Canvas
+import scipy.io
+from scipy import signal
+import numpy as np
+import matplotlib.pyplot as plt
+import time
+
 import interfacing  # local module
 
 DebugMode = True  # Debug mode enables printing
@@ -27,6 +35,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # Initialization functions
         interfacing.initConnectors(self)
         interfacing.initArrays(self)
+        interfacing.CreateSpectrogramFigure(self)
 
         self.amplitude = []
         self.time = []
@@ -40,6 +49,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.amplitude.append(float(line[1]))
                 self.time.append(float(line[0]))
         self.plot_data()
+
 
     def plot_data(self):
         pen = pg.mkPen(color=(255, 255, 255))
