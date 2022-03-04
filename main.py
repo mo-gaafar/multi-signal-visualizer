@@ -39,11 +39,8 @@ class MainWindow(QtWidgets.QMainWindow):
         interfacing.initArrays(self)
         interfacing.CreateSpectrogramFigure(self)
 
-        # self.amplitude = []
-        # self.time = []
-        # self.filename = ['']
-        self.xAxis = []
-        self.yAxis = []
+        self.xAxis = [0,0,0]
+        self.yAxis = [0,0,0]
         self.pointsToAppend = 0
 
     def Browse(self):
@@ -61,16 +58,19 @@ class MainWindow(QtWidgets.QMainWindow):
                     float(line[1]))
                 interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].Time.append(
                     float(line[0]))
+        interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].Filepath = path
         self.plot_data()  # starts plot after file is accessed
 
     def plot_data(self):
-        # TODO: Initialize Plotter Array
-        self.PlotterLineArr = []
 
-        # TODO: Make this range dependent on max current channels variable
-        for LineIndex in range(3):
-            pen = pg.mkPen(color=(255, 255, 255))
-            self.PlotterLineArr.append(self.Plot.plot(pen=pen))
+        pen = pg.mkPen(color=(255, 255, 255))
+        self.PlotWidget = self.Plot.plot(pen= pen)
+
+
+        
+        # TODO: Set limits based on all plottable signals
+        
+
 
         # self.Plot.plotItem.setLimits(xMin=min(self.time), xMax=max(self.time), yMin=min(
         #     self.amplitude), yMax=max(self.amplitude))  # limit bata3 al axis ali 3andi
@@ -90,19 +90,18 @@ class MainWindow(QtWidgets.QMainWindow):
             # checks if signal has information to be plotted
             # Check if channel contains data (TODO: change this later to a bool)
             if interfacing.ChannelLineArr[ChannelIndex].Filepath != "null":
-
                 # Index of channels containing files
-                self.FilledChannels.append(ChannelIndex)
+                #self.FilledChannels.append(ChannelIndex)
 
-                self.xAxis[ChannelIndex] = interfacing.ChannelLineArr[ChannelIndex].Amplitude[:self.pointsToAppend]
-                self.yAxis[ChannelIndex] = interfacing.ChannelLineArr[ChannelIndex].Time[:self.pointsToAppend]
-        interfacing.printDebug(self.xAxis[0])
+                self.xAxis[ChannelIndex] = interfacing.ChannelLineArr[ChannelIndex].Time[:self.pointsToAppend]
+                self.yAxis[ChannelIndex] = interfacing.ChannelLineArr[ChannelIndex].Amplitude[:self.pointsToAppend]
+        #interfacing.printDebug(self.xAxis[0])
         self.pointsToAppend += 10
         # if self.pointsToAppend > len(self.time):
         #     self.timer.stop()
         # TODO: if the shortest signal ends stop the timer
         #MinSignalLen = min(map(len, interfacing.ChannelLineArr.Time))
-        MinSignalLen = 10000000
+        MinSignalLen = 10000
         #interfacing.printDebug("Minimum signal length: " + str(MinSignalLen))
         if self.pointsToAppend > MinSignalLen:
             self.timer.stop()
@@ -118,13 +117,13 @@ class MainWindow(QtWidgets.QMainWindow):
         # VisibleYRange = (0,0)
         # VisibleXRange = (0,0)
 
-        # self.Plot.plotItem.setXRange(
-        #     max(self.x, default=0)-1.0, max(self.x, default=0))
+        #TODO: fix this 
+        self.Plot.plotItem.setXRange(max(self.xAxis[0], default=0)-1.0, max(self.xAxis[0], default=0))
 
-        for Index in range(len(self.PlotterLineArr)):
+        #Plots all signals
+        for Index in range(3): #TODO: make this variable later
             if interfacing.ChannelLineArr[Index].Filepath != "null":
-                
-                self.PlotterLineArr[Index].setData(
+                self.PlotWidget.setData(
                     self.xAxis[Index], self.yAxis[Index], pen=interfacing.ChannelLineArr[Index].GetColour(), skipFiniteCheck=True)
 
     def ExportPDF(self):
@@ -152,7 +151,27 @@ class MainWindow(QtWidgets.QMainWindow):
         interfacing.printDebug("Zoomout")
 
     def TogglePause(self):
-        interfacing.printDebug("Pause")
+        interfacing.printDebug("PauseToggle")
+
+    def horizontalScrollBarFunction(self,Input):
+        self.ValueHorizontal = Input
+        interfacing.printDebug("Horizontal Scroll: " + str(self.ValueHorizontal))
+
+    def verticalScrollBarFunction(self,Input):
+        self.ValueVertical = Input
+        interfacing.printDebug("Vertical Scroll: " + str(self.ValueVertical))
+    
+    def SpeedSliderFunction(self,Input):
+        self.ValueCineSpeed = Input
+        interfacing.printDebug("Speed Slider: " + str(self.ValueCineSpeed))
+
+    def SpectrogramFrequency(self,Input, MinOrMax):
+        if MinOrMax == "min":
+            self.SpectroMinFrequency = Input
+        if MinOrMax == "max":
+            self.SpectroMaxFrequency = Input
+
+        interfacing.printDebug(MinOrMax + "SpectroSlider: " + str(Input))
 
 
 def main():

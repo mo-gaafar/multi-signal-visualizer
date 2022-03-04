@@ -7,7 +7,7 @@ from main import DebugMode, MainWindow
 import string
 from PyQt5 import QtWidgets, uic
 from PyQt5 import QtGui, QtCore, QtWidgets
-from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QTextEdit, QFileDialog, QScrollBar, QComboBox, QCheckBox
+from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QSlider, QTextEdit, QFileDialog, QScrollBar, QComboBox, QCheckBox, QScrollBar
 # from pyparsing import null_debug_action
 
 import csv
@@ -36,6 +36,7 @@ ChannelLineArr = []
 # Global Interface Variables
 LabelTextBox = "null"
 
+
 # TODO: add themes here somehow? create theme object or dictionary?
 SpectroThemesArray = []
 
@@ -59,6 +60,7 @@ def SetSelectedIndex(Input, Selector):
     if Selector == "Spectro":
         global SpectroSelectedIndex
         SpectroSelectedIndex = Input
+        printDebug("Spectro dropdown: " + str(SpectroSelectedIndex))
 
 
 
@@ -69,9 +71,9 @@ class ChannelLine:
         self.Label = Label
         self.LineColour = LineColour
         self.IsHidden = IsHidden
-        self.Filepath = Filepath
-        self.Time = Time
-        self.Amplitude = Amplitude
+        self.Filepath = "null"
+        self.Time = []
+        self.Amplitude = []
         self.TimeArrFull = np.array([])
         self.AmplitudeArrFull = np.array([])
 
@@ -118,6 +120,7 @@ class PlotterWindow:
         self.timer.setInterval(20 / self.CineSpeed)  # Overflow timer
 
 
+
 class ChannelSpectrogram:
     def __init__(self, FreqRangeMax=1000, FreqRangeMin=0, SelectedChannel=1, SelectedTheme="Default"):
         self.FreqRangeMax = FreqRangeMax
@@ -160,6 +163,9 @@ def initConnectors(self):
     self.ZoomOut = self.findChild(QPushButton, "ZoomOut")
     self.ZoomOut.clicked.connect(self.ZoomOutFunction)
 
+    self.PausePlayBtn = self.findChild(QPushButton, "PausePlayBtn")
+    self.PausePlayBtn.clicked.connect(self.TogglePause)
+
     # Signal Colour Button
     self.SignalColour = self.findChild(QPushButton, "SignalColour")
     self.SignalColour.clicked.connect(
@@ -178,11 +184,27 @@ def initConnectors(self):
     self.SpectroMenu = self.findChild(QComboBox, "SpectroMenu")
     self.SpectroMenu.currentIndexChanged.connect(lambda: SetSelectedIndex(
         self.SpectroMenu.currentIndex(), "Spectro"))
-    # Plot
+    
+    #Scrollbars
+
+    self.horizontalScrollBar = self.findChild(QScrollBar, "horizontalScrollBar")
+    self.horizontalScrollBar.valueChanged.connect ( lambda: self.horizontalScrollBarFunction(self.horizontalScrollBar.value()))
+
+    self.verticalScrollBar = self.findChild(QScrollBar, "verticalScrollBar")
+    self.verticalScrollBar.valueChanged.connect ( lambda: self.verticalScrollBarFunction(self.verticalScrollBar.value()))
 
     # Cine speed slider
 
+    self.SpeedSlider = self.findChild(QSlider, "SpeedSlider")
+    self.SpeedSlider.valueChanged.connect(lambda: self.SpeedSliderFunction(self.SpeedSlider.value()))
     # call UpdateCineSpeed() on change
+
+    #Spectrogram Frequency Range Sliders
+    self.MinRangeSlider = self.findChild(QSlider, "MinRangeSlider")
+    self.MinRangeSlider.valueChanged.connect(lambda: self.SpectrogramFrequency(self.MinRangeSlider.value(), "min"))
+
+    self.MaxRangeSlider = self.findChild(QSlider, "MaxRangeSlider")
+    self.MaxRangeSlider.valueChanged.connect(lambda: self.SpectrogramFrequency(self.MaxRangeSlider.value(), "max"))
 
 
 def CreateSpectrogramFigure(self):
