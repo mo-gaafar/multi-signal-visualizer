@@ -4,6 +4,7 @@ from tkinter.tix import DirSelectDialog
 from PyQt5 import QtWidgets, uic
 from PyQt5 import QtGui, QtCore, QtWidgets
 from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QTextEdit, QFileDialog, QScrollBar, QComboBox, QColorDialog, QCheckBox
+from numpy.lib.index_tricks import IndexExpression
 
 from pyqtgraph import PlotWidget
 import pyqtgraph as pg
@@ -41,6 +42,8 @@ class MainWindow(QtWidgets.QMainWindow):
         # self.amplitude = []
         # self.time = []
         # self.filename = ['']
+        self.xAxis = []
+        self.yAxis = []
         self.pointsToAppend = 0
 
     def Browse(self):
@@ -67,7 +70,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # TODO: Make this range dependent on max current channels variable
         for LineIndex in range(3):
             pen = pg.mkPen(color=(255, 255, 255))
-            self.PlotterLineArr[LineIndex] = self.Plot.plot(pen=pen)
+            self.PlotterLineArr.append(self.Plot.plot(pen=pen))
 
         # self.Plot.plotItem.setLimits(xMin=min(self.time), xMax=max(self.time), yMin=min(
         #     self.amplitude), yMax=max(self.amplitude))  # limit bata3 al axis ali 3andi
@@ -83,7 +86,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def update_plot_data(self):
 
-        for ChannelIndex in range(interfacing.ChannelLineArr):
+        for ChannelIndex in range(len(interfacing.ChannelLineArr)):
             # checks if signal has information to be plotted
             # Check if channel contains data (TODO: change this later to a bool)
             if interfacing.ChannelLineArr[ChannelIndex].Filepath != "null":
@@ -91,15 +94,16 @@ class MainWindow(QtWidgets.QMainWindow):
                 # Index of channels containing files
                 self.FilledChannels.append(ChannelIndex)
 
-                self.x[ChannelIndex] = interfacing.ChannelLineArr[ChannelIndex].Amplitude[:self.pointsToAppend]
-                self.y[ChannelIndex] = interfacing.ChannelLineArr[ChannelIndex].Time[:self.pointsToAppend]
-
+                self.xAxis[ChannelIndex] = interfacing.ChannelLineArr[ChannelIndex].Amplitude[:self.pointsToAppend]
+                self.yAxis[ChannelIndex] = interfacing.ChannelLineArr[ChannelIndex].Time[:self.pointsToAppend]
+        interfacing.printDebug(self.xAxis[0])
         self.pointsToAppend += 10
         # if self.pointsToAppend > len(self.time):
         #     self.timer.stop()
         # TODO: if the shortest signal ends stop the timer
-        MinSignalLen = min(map(len, interfacing.ChannelLineArr.Time))
-        interfacing.printDebug("Minimum signal length: " + str(MinSignalLen))
+        #MinSignalLen = min(map(len, interfacing.ChannelLineArr.Time))
+        MinSignalLen = 10000000
+        #interfacing.printDebug("Minimum signal length: " + str(MinSignalLen))
         if self.pointsToAppend > MinSignalLen:
             self.timer.stop()
 
@@ -117,10 +121,11 @@ class MainWindow(QtWidgets.QMainWindow):
         # self.Plot.plotItem.setXRange(
         #     max(self.x, default=0)-1.0, max(self.x, default=0))
 
-        for Index in range(self.PlotterLineArr):
+        for Index in range(len(self.PlotterLineArr)):
             if interfacing.ChannelLineArr[Index].Filepath != "null":
+                
                 self.PlotterLineArr[Index].setData(
-                    self.x[Index], self.y[Index], pen=interfacing.ChannelLineArr[Index].GetColour(), skipFiniteCheck=True)
+                    self.xAxis[Index], self.yAxis[Index], pen=interfacing.ChannelLineArr[Index].GetColour(), skipFiniteCheck=True)
 
     def ExportPDF(self):
         # Folder Dialog (failed attempt)
