@@ -1,12 +1,16 @@
 
-#THIS FILE CONTAINS FUNCTION DEFENITIONS AND OBJECTS USED IN MAIN
-#IT WILL BE SPLIT INTO MORE LOGICAL MODULES IN THE FUTURE
+# THIS FILE CONTAINS FUNCTION DEFENITIONS AND OBJECTS USED IN MAIN
+# IT WILL BE SPLIT INTO MORE LOGICAL MODULES IN THE FUTURE
 
+from asyncio.windows_events import NULL
+from main import DebugMode, MainWindow
 import string
 from PyQt5 import QtWidgets, uic
 from PyQt5 import QtGui, QtCore, QtWidgets
 from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QTextEdit, QFileDialog, QScrollBar, QComboBox, QCheckBox
-#from pyparsing import null_debug_action
+# from pyparsing import null_debug_action
+
+import csv
 
 from pyqtgraph import PlotWidget
 import pyqtgraph as pg
@@ -19,14 +23,15 @@ from scipy import signal
 import numpy as np
 import matplotlib.pyplot as plt
 import time
-plt.rcParams['axes.facecolor']='black'
-plt.rc('axes',edgecolor='w')
-plt.rc('xtick',color='w')
-plt.rc('ytick',color='w')
-plt.rcParams['savefig.facecolor']='black'
+
+plt.rcParams['axes.facecolor'] = 'black'
+plt.rc('axes', edgecolor='w')
+plt.rc('xtick', color='w')
+plt.rc('ytick', color='w')
+plt.rcParams['savefig.facecolor'] = 'black'
 plt.rcParams["figure.autolayout"] = True
 
-from main import DebugMode, MainWindow
+ChannelLineArr = []
 
 # Global Interface Variables
 LabelTextBox = "null"
@@ -41,6 +46,11 @@ SignalSelectedIndex = 0
 SpectroSelectedIndex = 0
 
 
+def printDebug(Value):  # Enabled when global debug mode is on
+    if DebugMode == 1:
+        print(Value)
+
+
 def SetSelectedIndex(Input, Selector):
     if Selector == "Signal":
         global SignalSelectedIndex
@@ -49,32 +59,34 @@ def SetSelectedIndex(Input, Selector):
     if Selector == "Spectro":
         global SpectroSelectedIndex
         SpectroSelectedIndex = Input
-        printDebug("Spectrogram dropdown: " + str(SpectroSelectedIndex))
 
-
-
-ChannelLineArr = []
 
 
 class ChannelLine:
 
-    def __init__(self, Label="Unlabeled", LineColour=0xFFFF00, IsHidden=True, Filename="null"):
+    def __init__(self, Label="Unlabeled", LineColour=0xFFFF00,
+                 IsHidden=True, Filepath="null", Time=[], Amplitude=[]):
         self.Label = Label
         self.LineColour = LineColour
         self.IsHidden = IsHidden
-        #self.Filename = Filename
+        self.Filepath = Filepath
+        self.Time = Time
+        self.Amplitude = Amplitude
+        self.TimeArrFull = np.array([])
+        self.AmplitudeArrFull = np.array([])
 
     def UpdateColour(self):
         # self.LineColour =
-        #self.LineColour = "NONE"
+        # self.LineColour = "NONE"
         # print(self.LineColour)
         PrevColour = self.LineColour
         self.LineColour = MainWindow.SelectSignalColour(self)
-        if (self.LineColour == "#000000"):                      # Keeps previous colour if user cancels/selects black
+        # Keeps previous colour if user cancels/selects black
+        if (self.LineColour == "#000000"):
             self.LineColour = PrevColour
 
-        printDebug(str(self.LineColour) + " set as colour for channel: " +
-                  str(SignalSelectedIndex))
+        printDebug(str(self.LineColour) +
+                   " set as colour for channel: " + str(SignalSelectedIndex))
 
     # LineColour Getter
     def GetColour(self):
@@ -90,18 +102,20 @@ def initArrays(self):
         print(ChannelLineArr[Index])
     # Global plot channel object that contains related attributes
 
+
+# TO BE INITIALIZED AS GLOBAL VAR
 class PlotterWindow:
-    def __init__(self, YAxisRange = (0,1), XAxisRange = (-1,1) , CineSpeed = 1 ):
-        self.YAxisRange = YAxisRange #Tuple containing min/max ranges
-        self.XAxisRange = XAxisRange 
+    def __init__(self, YAxisRange=(0, 1), XAxisRange=(-1, 1), CineSpeed=1.0):
+        self.YAxisRange = YAxisRange  # Tuple containing min/max ranges
+        self.XAxisRange = XAxisRange
 
         self.CineSpeed = CineSpeed
-        
 
+    def UpdateCineSpeed(self, Input):
+        self.CineSpeed = Input
 
-def printDebug(Value): #Enabled when global debug mode is on
-    if DebugMode == 1:
-        print(Value)
+        self.timer = QtCore.QTimer()
+        self.timer.setInterval(20 / self.CineSpeed)  # Overflow timer
 
 
 class ChannelSpectrogram:
@@ -112,19 +126,16 @@ class ChannelSpectrogram:
 
     def UpdateFreqRange(Input, MinOrMax):
         if MinOrMax == "Min":
-            if DebugMode == True:
-                printDebug("Brengan")
+            printDebug("Brengan")
         # Updates the object variable
         # Update the attribute in the actual plot
         if MinOrMax == "Max":
-            if DebugMode == True:
-                printDebug("Brengan")
+            printDebug("Brengan")
         # Updates the object variable
         # Update the attribute in the actual plot
 
     def UpdateSelectedTheme(ThemeIndex):
-        if DebugMode == True:
-            printDebug("Brengan")
+        printDebug("Brengan")
         # Updates the object variable
         # Update the attribute in the actual plot
 
@@ -161,18 +172,22 @@ def initConnectors(self):
     # Updates global variable (SignalSelectedIndex) on combobox change
     self.ChannelsMenu = self.findChild(QComboBox, "ChannelsMenu")
     self.ChannelsMenu.currentIndexChanged.connect(lambda: SetSelectedIndex(
-        self.ChannelsMenu.currentIndex(),"Signal"))  # on index change
+        self.ChannelsMenu.currentIndex(), "Signal"))  # on index change
 
     # Updates SpectroSelectedIndex on change
     self.SpectroMenu = self.findChild(QComboBox, "SpectroMenu")
     self.SpectroMenu.currentIndexChanged.connect(lambda: SetSelectedIndex(
-    self.SpectroMenu.currentIndex(), "Spectro")) 
+        self.SpectroMenu.currentIndex(), "Spectro"))
     # Plot
+
+    # Cine speed slider
+
+    # call UpdateCineSpeed() on change
 
 
 def CreateSpectrogramFigure(self):
-        self.figure  = plt.figure()
-        self.figure.patch.set_facecolor('black')
-        self.axes = self.figure.add_subplot()
-        self.Spectrogram = Canvas(self.figure)
-        self.SpectrogramBox_2.addWidget(self.Spectrogram)
+    self.figure = plt.figure()
+    self.figure.patch.set_facecolor('black')
+    self.axes = self.figure.add_subplot()
+    self.Spectrogram = Canvas(self.figure)
+    self.SpectrogramBox_2.addWidget(self.Spectrogram)

@@ -20,7 +20,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import time
 
-import interfacing  # local module
+import interfacing # local module
+
 
 DebugMode = True  # Debug mode enables printing
 
@@ -37,49 +38,77 @@ class MainWindow(QtWidgets.QMainWindow):
         interfacing.initArrays(self)
         interfacing.CreateSpectrogramFigure(self)
 
-        self.amplitude = []
-        self.time = []
-        self.filename = ['']
-        self.pointsToAppend= 0
-
-    def openfile(self, path: str):  # to read the content of the
-        with open(path, 'r') as csvFile:    # 'r' its a mode for reading and writing
-            csvReader = csv.reader(csvFile, delimiter=',')
-            for line in csvReader:
-                self.amplitude.append(float(line[1]))
-                self.time.append(float(line[0]))
-        self.plot_data()
-
-
-    def plot_data(self):
-        pen = pg.mkPen(color=(255, 255, 255))
-        self.data_line = self.Plot.plot(self.time, self.amplitude, pen=pen)
-        self.Plot.plotItem.setLimits(xMin=min(self.time), xMax=max(self.time), yMin=min(self.amplitude), yMax=max(self.amplitude)) #limit bata3 al axis ali 3andi
-        self.pointsToAppend= 0
-        self.timer = QtCore.QTimer()
-        self.timer.setInterval(20)
-        self.timer.timeout.connect(self.update_plot_data)
-        self.timer.start()
-
-    def update_plot_data(self):
-
-        self.x = self.time[:self.pointsToAppend]
-        self.y = self.amplitude[:self.pointsToAppend]
-        self.pointsToAppend += 10
-        if self.pointsToAppend > len(self.time):
-            self.timers.stop()
-            
-        #if self.time[self.pointsToAppend] > 1:   #1 because this where our axis stops at at the begings to evry time we need to update the axis inorder for it to plot dynamiclly
-           # self.Plot.setLimits(xMax=max(self.x, default=0))
-        self.Plot.plotItem.setXRange(max(self.x, default=0)-1.0, max(self.x, default=0))
-        self.data_line.setData(self.x, self.y, pen=interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].GetColour())
+        # self.amplitude = []
+        # self.time = []
+        # self.filename = ['']
+        self.pointsToAppend = 0
 
     def Browse(self):
         self.filename = QFileDialog.getOpenFileName(
             None, 'open the signal file', './', filter="Raw Data(*.csv *.txt *.xls)")
         path = self.filename[0]
         interfacing.printDebug("Selected path: " + path)
-        self.openfile(path)
+        self.OpenFile(path)
+
+    def OpenFile(self, path: str):
+        with open(path, 'r') as csvFile:    # 'r' its a mode for reading and writing
+            csvReader = csv.reader(csvFile, delimiter=',')
+            for line in csvReader:
+                interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].Amplitude.append(
+                    float(line[1]))
+                interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].Time.append(
+                    float(line[0]))
+        self.plot_data() # starts plot after file is accessed
+
+    def plot_data(self):
+        # TODO: Initialize Plotter Array
+        self.PlotterLineArr = []
+
+        # TODO: Make this range dependent on max current channels variable
+        for LineIndex in range(3):
+            pen = pg.mkPen(color=(255, 255, 255))
+            self.PlotterLineArr[LineIndex] = self.Plot.plot(pen=pen)
+            #TODO: what if a line is 
+
+        self.Plot.plotItem.setLimits(xMin=min(self.time), xMax=max(self.time), yMin=min(
+            self.amplitude), yMax=max(self.amplitude))  # limit bata3 al axis ali 3andi
+        self.pointsToAppend = 0  # Plotted Points counter
+
+        # Initialize Qt Timer
+        self.timer = QtCore.QTimer()
+        self.timer.setInterval(20)  # Overflow timer
+        self.timer.timeout.connect(self.update_plot_data)  # Event handler
+        self.timer.start()  # Start timer
+
+    # def InitDataPoints(self):
+
+    def update_plot_data(self):
+
+        for ChannelIndex in range(interfacing.ChannelLineArr):
+            # checks if signal has information to be plotted
+            # Check if channel contains data (TODO: change this later to a bool) 
+            if interfacing.ChannelLineArr[ChannelIndex].Filepath != "null":
+
+                # Index of channels containing files
+                self.FilledChannels.append(ChannelIndex)
+
+                self.x[ChannelIndex] = interfacing.ChannelLineArr[ChannelIndex].Amplitude[:self.pointsToAppend]
+                self.y[ChannelIndex] = interfacing.ChannelLineArr[ChannelIndex].Time[:self.pointsToAppend]
+
+        # self.pointsToAppend += 10
+        # if self.pointsToAppend > len(self.time):
+        #     self.timer.stop()
+        # TODO: if the shortest signal ends stop the timer
+        if self.pointsToAppend > min(len(interfacing.ChannelLineArr.Time)):
+            self.timer.stop()
+
+        # if self.time[self.pointsToAppend] > 1:   #1 because this where our axis stops at at the begings to evry time we need to update the axis inorder for it to plot dynamiclly
+        # self.Plot.setLimits(xMax=max(self.x, default=0))
+        # TODO: Create array of dataline objects and update each one according to its appended values
+        self.Plot.plotItem.setXRange(
+            max(self.x, default=0)-1.0, max(self.x, default=0))
+        self.data_line.setData(
+            self.x, self.y, pen=interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].GetColour(), skipFiniteCheck=True)
 
     def ExportPDF(self):
         # Folder Dialog (failed attempt)
@@ -109,7 +138,6 @@ class MainWindow(QtWidgets.QMainWindow):
         interfacing.printDebug("Pause")
 
 
-
 def main():
     app = QtWidgets.QApplication(sys.argv)
     main = MainWindow()
@@ -122,3 +150,4 @@ if __name__ == '__main__':
 
 
 # BASIC CODE TO TEST WHETHER PYQTGRAPH WIDGET LOADS
+
