@@ -20,7 +20,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import time
 
-import interfacing # local module
+import interfacing  # local module
 
 
 DebugMode = True  # Debug mode enables printing
@@ -58,7 +58,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     float(line[1]))
                 interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].Time.append(
                     float(line[0]))
-        self.plot_data() # starts plot after file is accessed
+        self.plot_data()  # starts plot after file is accessed
 
     def plot_data(self):
         # TODO: Initialize Plotter Array
@@ -68,10 +68,9 @@ class MainWindow(QtWidgets.QMainWindow):
         for LineIndex in range(3):
             pen = pg.mkPen(color=(255, 255, 255))
             self.PlotterLineArr[LineIndex] = self.Plot.plot(pen=pen)
-            #TODO: what if a line is 
 
-        self.Plot.plotItem.setLimits(xMin=min(self.time), xMax=max(self.time), yMin=min(
-            self.amplitude), yMax=max(self.amplitude))  # limit bata3 al axis ali 3andi
+        # self.Plot.plotItem.setLimits(xMin=min(self.time), xMax=max(self.time), yMin=min(
+        #     self.amplitude), yMax=max(self.amplitude))  # limit bata3 al axis ali 3andi
         self.pointsToAppend = 0  # Plotted Points counter
 
         # Initialize Qt Timer
@@ -86,7 +85,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         for ChannelIndex in range(interfacing.ChannelLineArr):
             # checks if signal has information to be plotted
-            # Check if channel contains data (TODO: change this later to a bool) 
+            # Check if channel contains data (TODO: change this later to a bool)
             if interfacing.ChannelLineArr[ChannelIndex].Filepath != "null":
 
                 # Index of channels containing files
@@ -95,20 +94,33 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.x[ChannelIndex] = interfacing.ChannelLineArr[ChannelIndex].Amplitude[:self.pointsToAppend]
                 self.y[ChannelIndex] = interfacing.ChannelLineArr[ChannelIndex].Time[:self.pointsToAppend]
 
-        # self.pointsToAppend += 10
+        self.pointsToAppend += 10
         # if self.pointsToAppend > len(self.time):
         #     self.timer.stop()
         # TODO: if the shortest signal ends stop the timer
-        if self.pointsToAppend > min(len(interfacing.ChannelLineArr.Time)):
+        MinSignalLen = min(map(len, interfacing.ChannelLineArr.Time))
+        interfacing.printDebug("Minimum signal length: " + str(MinSignalLen))
+        if self.pointsToAppend > MinSignalLen:
             self.timer.stop()
 
         # if self.time[self.pointsToAppend] > 1:   #1 because this where our axis stops at at the begings to evry time we need to update the axis inorder for it to plot dynamiclly
         # self.Plot.setLimits(xMax=max(self.x, default=0))
+
         # TODO: Create array of dataline objects and update each one according to its appended values
-        self.Plot.plotItem.setXRange(
-            max(self.x, default=0)-1.0, max(self.x, default=0))
-        self.data_line.setData(
-            self.x, self.y, pen=interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].GetColour(), skipFiniteCheck=True)
+        # TODO: Set y limits based on all plottable signals
+        # TODO: Zoom and scrolling might require changes to limits
+
+        # TODO: to be embedded as in the class plotwindow
+        # VisibleYRange = (0,0)
+        # VisibleXRange = (0,0)
+
+        # self.Plot.plotItem.setXRange(
+        #     max(self.x, default=0)-1.0, max(self.x, default=0))
+
+        for Index in range(self.PlotterLineArr):
+            if interfacing.ChannelLineArr[Index].Filepath != "null":
+                self.PlotterLineArr[Index].setData(
+                    self.x[Index], self.y[Index], pen=interfacing.ChannelLineArr[Index].GetColour(), skipFiniteCheck=True)
 
     def ExportPDF(self):
         # Folder Dialog (failed attempt)
@@ -150,4 +162,3 @@ if __name__ == '__main__':
 
 
 # BASIC CODE TO TEST WHETHER PYQTGRAPH WIDGET LOADS
-
