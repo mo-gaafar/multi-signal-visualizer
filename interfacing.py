@@ -40,7 +40,6 @@ LabelTextBox = "null"
 # TODO: add themes here somehow? create theme object or dictionary?
 SpectroThemesArray = []
 
-CineSpeed = 1  # from 0.1 to 10x
 
 # Should be updated from combobox (on change)
 SignalSelectedIndex = 0
@@ -110,13 +109,15 @@ class PlotterWindow:
         self.YAxisRange = YAxisRange  # Tuple containing min/max ranges
         self.XAxisRange = XAxisRange
 
-        self.CineSpeed = CineSpeed
+        self.CineSpeed = 1.0
 
     def UpdateCineSpeed(self, Input):
-        self.CineSpeed = Input
-
-        self.timer = QtCore.QTimer()
-        self.timer.setInterval(20 / self.CineSpeed)  # Overflow timer
+        if Input >= 50:
+            self.CineSpeed = (Input/20)-1.5
+        if Input <50:
+            self.CineSpeed = 1/(((-5*Input)/50)+60)
+        #MainWindow.timer = QtCore.QTimer()
+        #MainWindow.timer.setInterval(100*self.CineSpeed)
 
 
 class ChannelSpectrogram:
@@ -197,6 +198,7 @@ def initConnectors(self):
     # Cine speed slider
 
     self.SpeedSlider = self.findChild(QSlider, "SpeedSlider")
+    self.SpeedSlider.setValue(50)
     self.SpeedSlider.valueChanged.connect(
         lambda: self.SpeedSliderFunction(self.SpeedSlider.value()))
     # call UpdateCineSpeed() on change

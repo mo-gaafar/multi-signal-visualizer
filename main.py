@@ -24,7 +24,9 @@ import time
 import interfacing  # local module
 
 
+
 DebugMode = True  # Debug mode enables printing
+
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -39,9 +41,13 @@ class MainWindow(QtWidgets.QMainWindow):
         interfacing.initArrays(self)
         interfacing.CreateSpectrogramFigure(self)
 
+        self.PlotterWindowProp = interfacing.PlotterWindow()
+        self.PauseToggleVar = False
+
         self.xAxis = [0,0,0]
         self.yAxis = [0,0,0]
         
+        self.LineReferenceArr = [self.Plot.plot(self.xAxis,self.yAxis), self.Plot.plot(self.xAxis,self.yAxis), self.Plot.plot(self.xAxis, self.yAxis)]
 
 
 
@@ -113,6 +119,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def update_plot_data(self):
 
+        self.timer.setInterval(100*self.PlotterWindowProp.CineSpeed)
+
         for ChannelIndex in range(len(interfacing.ChannelLineArr)):
             # checks if signal has information to be plotted
             # Check if channel contains data (TODO: change this later to a bool)
@@ -125,7 +133,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.yAxis[ChannelIndex] = interfacing.ChannelLineArr[ChannelIndex].Amplitude[:self.pointsToAppend]
 
         #interfacing.printDebug(self.xAxis[0])
-        self.pointsToAppend += 10
+        self.pointsToAppend += 5
         # if self.pointsToAppend > len(self.time):
         #     self.timer.stop()
         # TODO: if the shortest signal ends stop the timer
@@ -155,14 +163,16 @@ class MainWindow(QtWidgets.QMainWindow):
         #TODO: fix this 
         self.Plot.plotItem.setXRange(max(self.xAxis[0], default=0)-1.0, max(self.xAxis[0], default=0))
 
-        
+        for Index in range(3):
+            self.LineReferenceArr[Index].
 
         #Plots all signals
         for Index in range(3): #TODO: make this variable later
             if interfacing.ChannelLineArr[Index].Filepath != "null":
                 #TODO: signal should be time indexed
-                self.PlotWidget.setData(
-                    self.xAxis[0], self.yAxis[Index], pen=interfacing.ChannelLineArr[Index].GetColour(), skipFiniteCheck=True)
+                #self.PlotWidget.setData(
+                    #self.xAxis[0], self.yAxis[Index], pen=interfacing.ChannelLineArr[Index].GetColour(), skipFiniteCheck=True)
+                self.LineReferenceArr[Index].setData(self.xAxis[0], self.yAxis[Index], pen=interfacing.ChannelLineArr[Index].GetColour(), skipFiniteCheck=True)
 
     def ExportPDF(self):
         # Folder Dialog (failed attempt)
@@ -189,6 +199,11 @@ class MainWindow(QtWidgets.QMainWindow):
         interfacing.printDebug("Zoomout")
 
     def TogglePause(self):
+        self.PauseToggleVar = not self.PauseToggleVar #On click, toggle state
+        if self.PauseToggleVar == True:
+            self.timer.stop()
+        else:
+            self.timer.start()
         interfacing.printDebug("PauseToggle")
 
     def horizontalScrollBarFunction(self,Input):
@@ -202,6 +217,8 @@ class MainWindow(QtWidgets.QMainWindow):
     def SpeedSliderFunction(self,Input):
         self.ValueCineSpeed = Input
         interfacing.printDebug("Speed Slider: " + str(self.ValueCineSpeed))
+        self.PlotterWindowProp.UpdateCineSpeed(Input)
+        return self.ValueCineSpeed
 
     def SpectrogramFrequency(self,Input, MinOrMax):
         if MinOrMax == "min":
