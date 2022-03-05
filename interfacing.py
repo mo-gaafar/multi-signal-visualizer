@@ -12,7 +12,7 @@ from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QSlider, QTe
 
 import csv
 
-from pyqtgraph import PlotWidget
+#from pyqtgraph import PlotWidget
 import pyqtgraph as pg
 import sys
 
@@ -63,13 +63,12 @@ def SetSelectedIndex(Input, Selector):
         printDebug("Spectro dropdown: " + str(SpectroSelectedIndex))
 
 
-
 class ChannelLine:
 
     def __init__(self, Label="Unlabeled", LineColour=0xFFFF00,
                  IsHidden=True, Filepath="null", Time=[], Amplitude=[]):
-        self.Label = Label
-        self.LineColour = LineColour
+        self.Label = "untitled"
+        self.LineColour = 0xffff00
         self.IsHidden = IsHidden
         self.Filepath = "null"
         self.Time = []
@@ -118,7 +117,6 @@ class PlotterWindow:
 
         self.timer = QtCore.QTimer()
         self.timer.setInterval(20 / self.CineSpeed)  # Overflow timer
-
 
 
 class ChannelSpectrogram:
@@ -184,27 +182,33 @@ def initConnectors(self):
     self.SpectroMenu = self.findChild(QComboBox, "SpectroMenu")
     self.SpectroMenu.currentIndexChanged.connect(lambda: SetSelectedIndex(
         self.SpectroMenu.currentIndex(), "Spectro"))
-    
-    #Scrollbars
 
-    self.horizontalScrollBar = self.findChild(QScrollBar, "horizontalScrollBar")
-    self.horizontalScrollBar.valueChanged.connect ( lambda: self.horizontalScrollBarFunction(self.horizontalScrollBar.value()))
+    # Scrollbars
+
+    self.horizontalScrollBar = self.findChild(
+        QScrollBar, "horizontalScrollBar")
+    self.horizontalScrollBar.valueChanged.connect(
+        lambda: self.horizontalScrollBarFunction(self.horizontalScrollBar.value()))
 
     self.verticalScrollBar = self.findChild(QScrollBar, "verticalScrollBar")
-    self.verticalScrollBar.valueChanged.connect ( lambda: self.verticalScrollBarFunction(self.verticalScrollBar.value()))
+    self.verticalScrollBar.valueChanged.connect(
+        lambda: self.verticalScrollBarFunction(self.verticalScrollBar.value()))
 
     # Cine speed slider
 
     self.SpeedSlider = self.findChild(QSlider, "SpeedSlider")
-    self.SpeedSlider.valueChanged.connect(lambda: self.SpeedSliderFunction(self.SpeedSlider.value()))
+    self.SpeedSlider.valueChanged.connect(
+        lambda: self.SpeedSliderFunction(self.SpeedSlider.value()))
     # call UpdateCineSpeed() on change
 
-    #Spectrogram Frequency Range Sliders
+    # Spectrogram Frequency Range Sliders
     self.MinRangeSlider = self.findChild(QSlider, "MinRangeSlider")
-    self.MinRangeSlider.valueChanged.connect(lambda: self.SpectrogramFrequency(self.MinRangeSlider.value(), "min"))
+    self.MinRangeSlider.valueChanged.connect(
+        lambda: self.SpectrogramFrequency(self.MinRangeSlider.value(), "min"))
 
     self.MaxRangeSlider = self.findChild(QSlider, "MaxRangeSlider")
-    self.MaxRangeSlider.valueChanged.connect(lambda: self.SpectrogramFrequency(self.MaxRangeSlider.value(), "max"))
+    self.MaxRangeSlider.valueChanged.connect(
+        lambda: self.SpectrogramFrequency(self.MaxRangeSlider.value(), "max"))
 
 
 def CreateSpectrogramFigure(self):

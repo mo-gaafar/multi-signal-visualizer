@@ -41,7 +41,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.xAxis = [0,0,0]
         self.yAxis = [0,0,0]
-        self.pointsToAppend = 0
+        
+
+
 
     def Browse(self):
         self.filename = QFileDialog.getOpenFileName(
@@ -51,37 +53,62 @@ class MainWindow(QtWidgets.QMainWindow):
         self.OpenFile(path)
 
     def OpenFile(self, path: str):
+        TempArrX = []
+        TempArrY = []
+
         with open(path, 'r') as csvFile:    # 'r' its a mode for reading and writing
             csvReader = csv.reader(csvFile, delimiter=',')
             for line in csvReader:
-                interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].Amplitude.append(
+                TempArrY.append(
                     float(line[1]))
-                interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].Time.append(
+                TempArrX.append(
                     float(line[0]))
+
+        interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].Amplitude = TempArrY
+        interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].Time = TempArrX
         interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].Filepath = path
+
+
         self.plot_data()  # starts plot after file is accessed
 
     def plot_data(self):
 
         pen = pg.mkPen(color=(255, 255, 255))
         self.PlotWidget = self.Plot.plot(pen= pen)
+        self.Plot.showGrid(x = True, y = True)
+        self.Plot.addLegend()
 
+        self.MinSignalLen = len(interfacing.ChannelLineArr[0].Amplitude)
+        interfacing.printDebug("Max length of x plots is: " + str(self.MinSignalLen))
+        self.pointsToAppend = 0
 
-        
         # TODO: Set limits based on all plottable signals
         
 
+        MaxX = 0
+        MaxY = 0
 
-        # self.Plot.plotItem.setLimits(xMin=min(self.time), xMax=max(self.time), yMin=min(
+        for Index in range(3):
+            if len(interfacing.ChannelLineArr[Index].Time) != 0 and len(interfacing.ChannelLineArr[Index].Time) > MaxX:
+                MaxX = len(interfacing.ChannelLineArr[Index].Time)
+
+            if len(interfacing.ChannelLineArr[Index].Amplitude) != 0 and len(interfacing.ChannelLineArr[Index].Time) > MaxY:
+                MaxY = len(interfacing.ChannelLineArr[Index].Amplitude)
+
+        #interfacing.printDebug("MaxY = " + str(MaxY))
+        #self.Plot.plotItem.setLimits(xMin=min(self.time), xMax=max(self.time), yMin=min(
         #     self.amplitude), yMax=max(self.amplitude))  # limit bata3 al axis ali 3andi
+        MinY = -1 #Placeholder
+        interfacing.printDebug("MaxX: " + str(MaxX))
+        self.Plot.plotItem.setLimits(xMin=0, xMax=MaxX, yMin=MinY, yMax=MaxY)  # limit bata3 al axis ali 3andi
         self.pointsToAppend = 0  # Plotted Points counter
 
         # Initialize Qt Timer
         self.timer = QtCore.QTimer()
-        self.timer.setInterval(20)  # Overflow timer
+        self.timer.setInterval(150)  # Overflow timer
         self.timer.timeout.connect(self.update_plot_data)  # Event handler
         self.timer.start()  # Start timer
-
+          
     # def InitDataPoints(self):
 
     def update_plot_data(self):
@@ -90,26 +117,34 @@ class MainWindow(QtWidgets.QMainWindow):
             # checks if signal has information to be plotted
             # Check if channel contains data (TODO: change this later to a bool)
             if interfacing.ChannelLineArr[ChannelIndex].Filepath != "null":
+                
                 # Index of channels containing files
                 #self.FilledChannels.append(ChannelIndex)
 
                 self.xAxis[ChannelIndex] = interfacing.ChannelLineArr[ChannelIndex].Time[:self.pointsToAppend]
                 self.yAxis[ChannelIndex] = interfacing.ChannelLineArr[ChannelIndex].Amplitude[:self.pointsToAppend]
+
         #interfacing.printDebug(self.xAxis[0])
         self.pointsToAppend += 10
         # if self.pointsToAppend > len(self.time):
         #     self.timer.stop()
         # TODO: if the shortest signal ends stop the timer
         #MinSignalLen = min(map(len, interfacing.ChannelLineArr.Time))
-        MinSignalLen = 10000
+
+        #DEBUGGING LOOP
+        for Index in range(3):
+            if interfacing.ChannelLineArr[Index].Filepath != "null":
+                interfacing.printDebug("Channel number: " + str(Index))
+                interfacing.printDebug(len(interfacing.ChannelLineArr[Index].Time))
+                interfacing.printDebug(len(self.xAxis[Index]))
+        
         #interfacing.printDebug("Minimum signal length: " + str(MinSignalLen))
-        if self.pointsToAppend > MinSignalLen:
+        if self.pointsToAppend > self.MinSignalLen:
             self.timer.stop()
 
         # if self.time[self.pointsToAppend] > 1:   #1 because this where our axis stops at at the begings to evry time we need to update the axis inorder for it to plot dynamiclly
         # self.Plot.setLimits(xMax=max(self.x, default=0))
 
-        # TODO: Create array of dataline objects and update each one according to its appended values
         # TODO: Set y limits based on all plottable signals
         # TODO: Zoom and scrolling might require changes to limits
 
@@ -120,11 +155,14 @@ class MainWindow(QtWidgets.QMainWindow):
         #TODO: fix this 
         self.Plot.plotItem.setXRange(max(self.xAxis[0], default=0)-1.0, max(self.xAxis[0], default=0))
 
+        
+
         #Plots all signals
         for Index in range(3): #TODO: make this variable later
             if interfacing.ChannelLineArr[Index].Filepath != "null":
+                #TODO: signal should be time indexed
                 self.PlotWidget.setData(
-                    self.xAxis[Index], self.yAxis[Index], pen=interfacing.ChannelLineArr[Index].GetColour(), skipFiniteCheck=True)
+                    self.xAxis[0], self.yAxis[Index], pen=interfacing.ChannelLineArr[Index].GetColour(), skipFiniteCheck=True)
 
     def ExportPDF(self):
         # Folder Dialog (failed attempt)
