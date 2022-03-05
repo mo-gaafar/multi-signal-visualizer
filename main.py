@@ -21,7 +21,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import time
 
+from wfdb.io.record import rdrecord
+
 import interfacing  # local module
+import wfdb
 
 
 plt.rcParams['axes.facecolor']='black'
@@ -33,7 +36,7 @@ plt.rcParams["figure.autolayout"] = True
 
 
 
-DebugMode = True  # Debug mode enables printing
+DebugMode = False  # Debug mode enables printing
 
 
 
@@ -61,7 +64,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def Browse(self):
         self.filename = QFileDialog.getOpenFileName(
-            None, 'open the signal file', './', filter="Raw Data(*.csv *.txt *.xls)")
+            None, 'open the signal file', './', filter="Raw Data(*.csv *.txt *.xls *.hea *.dat *.rec)")
         path = self.filename[0]
         interfacing.printDebug("Selected path: " + path)
         self.OpenFile(path)
@@ -69,14 +72,28 @@ class MainWindow(QtWidgets.QMainWindow):
     def OpenFile(self, path: str):
         TempArrX = []
         TempArrY = []
+        
+        filetype = path[len(path)-3:] #gets last 3 letters of path
 
-        with open(path, 'r') as csvFile:    # 'r' its a mode for reading and writing
-            csvReader = csv.reader(csvFile, delimiter=',')
-            for line in csvReader:
-                TempArrY.append(
-                    float(line[1]))
-                TempArrX.append(
-                    float(line[0]))
+        if filetype == "hea" or filetype == "rec" or filetype == "dat":
+           self.record = wfdb.rdrecord(path[:-4])
+           #self.d_signal = self.record.adc()
+           #TempArrX = self.d_signal[:][1]
+           TempArrY = self.record.p_signal
+           print(self.record.fs)
+           print(TempArrY)
+           for Index in len(TempArrY):
+               TempArrX.append(Index/self.record.fs)
+           
+
+        if filetype == "csv" or filetype == "txt" or filetype == "xls":
+            with open(path, 'r') as csvFile:    # 'r' its a mode for reading and writing
+                csvReader = csv.reader(csvFile, delimiter=',')
+                for line in csvReader:
+                    TempArrY.append(
+                        float(line[1]))
+                    TempArrX.append(
+                        float(line[0]))
 
         interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].Amplitude = TempArrY
         interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].Time = TempArrX
