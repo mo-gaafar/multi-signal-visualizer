@@ -120,15 +120,15 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Initialize Qt Timer
         self.timer = QtCore.QTimer()
-        self.timer.setInterval(150)  # Overflow timer
+        self.timer.setInterval(50/3)  # Overflow timer
         self.timer.timeout.connect(self.update_plot_data)  # Event handler
         self.timer.start()  # Start timer
           
     # def InitDataPoints(self):
 
     def update_plot_data(self):
-
-        self.timer.setInterval(100*self.PlotterWindowProp.CineSpeed)
+        print("Timer ", self.timer.interval())
+        self.timer.setInterval(self.PlotterWindowProp.CineSpeed)
 
         for ChannelIndex in range(len(interfacing.ChannelLineArr)):
             # checks if signal has information to be plotted
@@ -250,7 +250,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.freqs, self.times, self.Sx = signal.spectrogram(self.SignalArray, fs=FS, window='hanning',nfft=256,noverlap=128, detrend=False,mode  = 'magnitude',scaling ='density')
 
             self.max_freq = np.max(self.freqs)
-            self.axes.set_ylim([0,0.2])
+            self.axes.set_ylim([interfacing.FreqRangeMin, interfacing.FreqRangeMax])
             self.axes.pcolormesh(self.times, self.freqs  , self.Sx, cmap = interfacing.SpectroTheme)
             self.axes.set_ylabel('Frequency [kHz]', color = 'white')
             self.axes.set_xlabel('Time [s]', color = 'white')
@@ -268,10 +268,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def SpectrogramFrequency(self,Input, MinOrMax):
         if MinOrMax == "min":
-            self.SpectroMinFrequency = Input
+            interfacing.FreqRangeMin = Input
         if MinOrMax == "max":
-            self.SpectroMaxFrequency = Input
+            interfacing.FreqRangeMax = Input
 
+        self.plotSpectro()
         interfacing.printDebug(MinOrMax + "SpectroSlider: " + str(Input))
 
 #------------------------------------------------------------------------------------------------------------------------------------------------------#

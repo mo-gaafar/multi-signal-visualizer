@@ -7,10 +7,11 @@ from main import DebugMode, MainWindow
 import string
 from PyQt5 import QtWidgets, uic
 from PyQt5 import QtGui, QtCore, QtWidgets
-from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QSlider, QTextEdit, QFileDialog, QScrollBar, QComboBox, QCheckBox, QScrollBar
+from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QSlider, QTextEdit, QFileDialog, QScrollBar, QComboBox, QCheckBox, QScrollBar, QLCDNumber
 # from pyparsing import null_debug_action
 
 import csv
+import math
 
 #from pyqtgraph import PlotWidget
 import pyqtgraph as pg
@@ -28,6 +29,8 @@ ChannelLineArr = []
 
 # Global Interface Variables
 LabelTextBox = "null"
+FreqRangeMin = 0
+FreqRangeMax = 15
 
 
 # TODO: add themes here somehow? create theme object or dictionary?
@@ -98,13 +101,10 @@ class PlotterWindow:
         self.YAxisRange = YAxisRange  # Tuple containing min/max ranges
         self.XAxisRange = XAxisRange
 
-        self.CineSpeed = 1.0
+        self.CineSpeed = 50/3
 
     def UpdateCineSpeed(self, Input):
-        if Input >= 50:
-            self.CineSpeed = (Input/20)-1.5
-        if Input <50:
-            self.CineSpeed = 1/(((-5*Input)/50)+60)
+            self.CineSpeed = (50/3) / (Input/100)
         #MainWindow.timer = QtCore.QTimer()
         #MainWindow.timer.setInterval(100*self.CineSpeed)
 
@@ -190,16 +190,27 @@ def initConnectors(self):
     # Cine speed slider
 
     self.SpeedSlider = self.findChild(QSlider, "SpeedSlider")
-    self.SpeedSlider.setValue(50)
     self.SpeedSlider.valueChanged.connect(
         lambda: self.SpeedSliderFunction(self.SpeedSlider.value()))
     # call UpdateCineSpeed() on change
 
     # Spectrogram Frequency Range Sliders
     self.MinRangeSlider = self.findChild(QSlider, "MinRangeSlider")
-    self.MinRangeSlider.valueChanged.connect(
+    self.MinRangeSlider.sliderReleased.connect(
         lambda: self.SpectrogramFrequency(self.MinRangeSlider.value(), "min"))
 
     self.MaxRangeSlider = self.findChild(QSlider, "MaxRangeSlider")
-    self.MaxRangeSlider.valueChanged.connect(
+    self.MaxRangeSlider.sliderReleased.connect(
         lambda: self.SpectrogramFrequency(self.MaxRangeSlider.value(), "max"))
+
+    self.SpeedLCD = self.findChild(QLCDNumber, "SpeedLCD")
+    self.SpeedSlider.valueChanged.connect(
+        lambda: self.SpeedLCD.display(round((self.SpeedSlider.value()/100)*4)/4))
+
+    self.MinLCD = self.findChild(QLCDNumber, "MinLCD")
+    self.MinRangeSlider.valueChanged.connect(
+        lambda: self.MinLCD.display(self.MinRangeSlider.value()))
+
+    self.MaxLCD = self.findChild(QLCDNumber, "MaxLCD")
+    self.MaxRangeSlider.valueChanged.connect(
+        lambda: self.MaxLCD.display(self.MaxRangeSlider.value()))
