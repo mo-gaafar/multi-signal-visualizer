@@ -24,13 +24,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import time
 
-plt.rcParams['axes.facecolor'] = 'black'
-plt.rc('axes', edgecolor='w')
-plt.rc('xtick', color='w')
-plt.rc('ytick', color='w')
-plt.rcParams['savefig.facecolor'] = 'black'
-plt.rcParams["figure.autolayout"] = True
-
 ChannelLineArr = []
 
 # Global Interface Variables
@@ -38,7 +31,7 @@ LabelTextBox = "null"
 
 
 # TODO: add themes here somehow? create theme object or dictionary?
-SpectroThemesArray = []
+SpectroTheme = 'viridis'
 
 
 # Should be updated from combobox (on change)
@@ -56,10 +49,6 @@ def SetSelectedIndex(Input, Selector):
         global SignalSelectedIndex
         SignalSelectedIndex = Input
         printDebug("Signal dropdown: " + str(SignalSelectedIndex))
-    if Selector == "Spectro":
-        global SpectroSelectedIndex
-        SpectroSelectedIndex = Input
-        printDebug("Spectro dropdown: " + str(SpectroSelectedIndex))
 
 
 class ChannelLine:
@@ -174,6 +163,9 @@ def initConnectors(self):
     self.ShowHide.stateChanged.connect(
         lambda: ChannelLineArr[SignalSelectedIndex].UpdateHide())
 
+    self.ThemesMenu = self.findChild(QComboBox, "ThemesMenu")
+    self.ThemesMenu.currentIndexChanged.connect(lambda: MainWindow.SetSpectroTheme(self, self.ThemesMenu.currentText()))  # on index change
+
     # Updates global variable (SignalSelectedIndex) on combobox change
     self.ChannelsMenu = self.findChild(QComboBox, "ChannelsMenu")
     self.ChannelsMenu.currentIndexChanged.connect(lambda: SetSelectedIndex(
@@ -181,8 +173,8 @@ def initConnectors(self):
 
     # Updates SpectroSelectedIndex on change
     self.SpectroMenu = self.findChild(QComboBox, "SpectroMenu")
-    self.SpectroMenu.currentIndexChanged.connect(lambda: SetSelectedIndex(
-        self.SpectroMenu.currentIndex(), "Spectro"))
+    self.SpectroMenu.currentIndexChanged.connect(lambda: MainWindow.SetSpectroSelectedIndex(self, 
+        self.SpectroMenu.currentIndex()))
 
     # Scrollbars
 
@@ -211,11 +203,3 @@ def initConnectors(self):
     self.MaxRangeSlider = self.findChild(QSlider, "MaxRangeSlider")
     self.MaxRangeSlider.valueChanged.connect(
         lambda: self.SpectrogramFrequency(self.MaxRangeSlider.value(), "max"))
-
-
-def CreateSpectrogramFigure(self):
-    self.figure = plt.figure()
-    self.figure.patch.set_facecolor('black')
-    self.axes = self.figure.add_subplot()
-    self.Spectrogram = Canvas(self.figure)
-    self.SpectrogramBox_2.addWidget(self.Spectrogram)

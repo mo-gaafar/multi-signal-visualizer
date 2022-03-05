@@ -24,6 +24,14 @@ import time
 import interfacing  # local module
 
 
+plt.rcParams['axes.facecolor']='black'
+plt.rc('axes',edgecolor='w')
+plt.rc('xtick',color='w')
+plt.rc('ytick',color='w')
+plt.rcParams['savefig.facecolor']='black'
+plt.rcParams["figure.autolayout"] = True
+
+
 
 DebugMode = True  # Debug mode enables printing
 
@@ -39,7 +47,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # Initialization functions
         interfacing.initConnectors(self)
         interfacing.initArrays(self)
-        interfacing.CreateSpectrogramFigure(self)
+        self.CreateSpectrogramFigure()
 
         self.PlotterWindowProp = interfacing.PlotterWindow()
         self.PauseToggleVar = False
@@ -74,6 +82,7 @@ class MainWindow(QtWidgets.QMainWindow):
         interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].Time = TempArrX
         interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].Filepath = path
 
+        self.plotSpectro()
 
         self.plot_data()  # starts plot after file is accessed
 
@@ -163,9 +172,6 @@ class MainWindow(QtWidgets.QMainWindow):
         #TODO: fix this 
         self.Plot.plotItem.setXRange(max(self.xAxis[0], default=0)-1.0, max(self.xAxis[0], default=0))
 
-        for Index in range(3):
-            self.LineReferenceArr[Index].
-
         #Plots all signals
         for Index in range(3): #TODO: make this variable later
             if interfacing.ChannelLineArr[Index].Filepath != "null":
@@ -214,11 +220,51 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ValueVertical = Input
         interfacing.printDebug("Vertical Scroll: " + str(self.ValueVertical))
     
+
     def SpeedSliderFunction(self,Input):
         self.ValueCineSpeed = Input
         interfacing.printDebug("Speed Slider: " + str(self.ValueCineSpeed))
         self.PlotterWindowProp.UpdateCineSpeed(Input)
         return self.ValueCineSpeed
+
+
+#------------------------------------------------------SPECTROGRAM FUNCTIONS------------------------------------------------------------------------------------#
+
+    def CreateSpectrogramFigure(self):
+        self.figure  = plt.figure()                     # Create matplotlib fig
+        self.figure.patch.set_facecolor('black')
+        self.axes = self.figure.add_subplot()
+        self.Spectrogram = Canvas(self.figure)
+        self.SpectrogramBox_2.addWidget(self.Spectrogram)
+
+    def plotSpectro(self):
+        
+        if len(interfacing.ChannelLineArr[interfacing.SpectroSelectedIndex].Amplitude) == 0:        # Corner Case Of Empty Channel
+            self.Spectrogram.draw()
+            self.figure.canvas.draw()
+
+        else:
+
+            FS = 30
+            self.SignalArray = np.array(interfacing.ChannelLineArr[interfacing.SpectroSelectedIndex].Amplitude)
+            self.freqs, self.times, self.Sx = signal.spectrogram(self.SignalArray, fs=FS, window='hanning',nfft=256,noverlap=128, detrend=False,mode  = 'magnitude',scaling ='density')
+
+            self.max_freq = np.max(self.freqs)
+            self.axes.set_ylim([0,0.2])
+            self.axes.pcolormesh(self.times, self.freqs  , self.Sx, cmap = interfacing.SpectroTheme)
+            self.axes.set_ylabel('Frequency [kHz]', color = 'white')
+            self.axes.set_xlabel('Time [s]', color = 'white')
+            self.Spectrogram.draw()
+            self.figure.canvas.draw()
+
+    def SetSpectroSelectedIndex(self, Input):
+        interfacing.SpectroSelectedIndex = Input
+        self.plotSpectro()
+
+    def SetSpectroTheme(self, Input):
+        interfacing.SpectroTheme = Input
+        self.plotSpectro()
+        print(interfacing.SpectroTheme)
 
     def SpectrogramFrequency(self,Input, MinOrMax):
         if MinOrMax == "min":
@@ -227,6 +273,8 @@ class MainWindow(QtWidgets.QMainWindow):
             self.SpectroMaxFrequency = Input
 
         interfacing.printDebug(MinOrMax + "SpectroSlider: " + str(Input))
+
+#------------------------------------------------------------------------------------------------------------------------------------------------------#
 
 
 def main():
