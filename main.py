@@ -69,7 +69,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def OpenFile(self, path: str):
         TempArrX = []
         TempArrY = []
-
+        self.fsampling = 0
         filetype = path[len(path)-3:]  # gets last 3 letters of path
 
         if filetype == "hea" or filetype == "rec" or filetype == "dat":
@@ -257,14 +257,17 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def plotSpectro(self):
 
+        FS = 30
+
         # Corner Case Of Empty Channel
         if len(interfacing.ChannelLineArr[interfacing.SpectroSelectedIndex].Amplitude) == 0:
             self.Spectrogram.draw()
             self.figure.canvas.draw()
 
         else:
+            if self.fsampling != 0:
+                FS = self.fsampling
 
-            FS = 30
             self.SignalArray = np.array(
                 interfacing.ChannelLineArr[interfacing.SpectroSelectedIndex].Amplitude)
             self.freqs, self.times, self.Sx = signal.spectrogram(
