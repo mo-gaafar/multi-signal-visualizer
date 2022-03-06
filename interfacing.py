@@ -57,7 +57,7 @@ def SetSelectedIndex(Input, Selector):
 class ChannelLine:
 
     def __init__(self, Label="Unlabeled", LineColour=0xFFFF00,
-                 IsHidden=True, Filepath="null", Time=[], Amplitude=[]):
+                 IsHidden=False, Filepath="null", Time=[], Amplitude=[]):
         self.Label = "untitled"
         self.LineColour = 0xffff00
         self.IsHidden = IsHidden
@@ -104,9 +104,9 @@ class PlotterWindow:
         self.CineSpeed = 50
 
     def UpdateCineSpeed(self, Input):
-            self.CineSpeed = (50) / (Input/100)
+        self.CineSpeed = (50) / (Input/100)
         #MainWindow.timer = QtCore.QTimer()
-        #MainWindow.timer.setInterval(100*self.CineSpeed)
+        # MainWindow.timer.setInterval(100*self.CineSpeed)
 
 
 class ChannelSpectrogram:
@@ -164,17 +164,23 @@ def initConnectors(self):
         lambda: ChannelLineArr[SignalSelectedIndex].UpdateHide())
 
     self.ThemesMenu = self.findChild(QComboBox, "ThemesMenu")
-    self.ThemesMenu.currentIndexChanged.connect(lambda: MainWindow.SetSpectroTheme(self, self.ThemesMenu.currentText()))  # on index change
+    self.ThemesMenu.currentIndexChanged.connect(lambda: MainWindow.SetSpectroTheme(
+        self, self.ThemesMenu.currentText()))  # on index change
 
     # Updates global variable (SignalSelectedIndex) on combobox change
     self.ChannelsMenu = self.findChild(QComboBox, "ChannelsMenu")
     self.ChannelsMenu.currentIndexChanged.connect(lambda: SetSelectedIndex(
         self.ChannelsMenu.currentIndex(), "Signal"))  # on index change
 
+    # Hide/Unhide checkbox
+    self.ShowHide = self.findChild(QCheckBox, "ShowHide")
+    self.ShowHide.stateChanged.connect(
+        lambda: MainWindow.ToggleHide(self, self.ShowHide.isChecked()))
+
     # Updates SpectroSelectedIndex on change
     self.SpectroMenu = self.findChild(QComboBox, "SpectroMenu")
-    self.SpectroMenu.currentIndexChanged.connect(lambda: MainWindow.SetSpectroSelectedIndex(self, 
-        self.SpectroMenu.currentIndex()))
+    self.SpectroMenu.currentIndexChanged.connect(lambda: MainWindow.SetSpectroSelectedIndex(self,
+                                                                                            self.SpectroMenu.currentIndex()))
 
     # Scrollbars
 

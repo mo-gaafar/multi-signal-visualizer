@@ -45,6 +45,10 @@ class MainWindow(QtWidgets.QMainWindow):
         super(MainWindow, self).__init__(*args, **kwargs)
         uic.loadUi('mainwindow2.ui', self)
 
+        self.setWindowIcon(QtGui.QIcon('icon.png'))
+        # set the title
+        self.setWindowTitle("Multi-Channel Signal Viewer")
+
         # Initialization functions
         interfacing.initConnectors(self)
         interfacing.initArrays(self)
@@ -73,12 +77,11 @@ class MainWindow(QtWidgets.QMainWindow):
         filetype = path[len(path)-3:]  # gets last 3 letters of path
 
         if filetype == "hea" or filetype == "rec" or filetype == "dat":
-            self.record = wfdb.rdrecord(path[:-4], channels=[1])
-            #self.d_signal = self.record.adc()
-            #TempArrX = self.d_signal[:][1]
+            self.record = wfdb.rdrecord(path[:-4], channels=[0])
             TempArrY = self.record.p_signal
             TempArrY = np.concatenate(TempArrY)
             print(self.record.fs)
+            self.fsampling = self.record.fs
             print(TempArrY)
             for Index in range(len(TempArrY)):
                 TempArrX.append(Index/self.record.fs)
@@ -142,7 +145,7 @@ class MainWindow(QtWidgets.QMainWindow):
     # def InitDataPoints(self):
 
     def update_plot_data(self):
-        print("Timer ", self.timer.interval())
+        # print("Timer ", self.timer.interval())
         self.timer.setInterval(self.PlotterWindowProp.CineSpeed)
 
         for ChannelIndex in range(len(interfacing.ChannelLineArr)):
@@ -179,11 +182,6 @@ class MainWindow(QtWidgets.QMainWindow):
         # self.Plot.setLimits(xMax=max(self.x, default=0))
 
         # TODO: Set y limits based on all plottable signals
-        # TODO: Zoom and scrolling might require changes to limits
-
-        # TODO: to be embedded as in the class plotwindow
-        # VisibleYRange = (0,0)
-        # VisibleXRange = (0,0)
 
         # TODO: fix this
         self.Plot.plotItem.setXRange(
@@ -195,6 +193,11 @@ class MainWindow(QtWidgets.QMainWindow):
                 # TODO: signal should be time indexed
                 # self.PlotWidget.setData(
                 # self.xAxis[0], self.yAxis[Index], pen=interfacing.ChannelLineArr[Index].GetColour(), skipFiniteCheck=True)
+                if interfacing.ChannelLineArr[Index].IsHidden == True:
+                    self.LineReferenceArr[Index].hide()
+                else:
+                    self.LineReferenceArr[Index].show()
+
                 self.LineReferenceArr[Index].setData(
                     self.xAxis[0], self.yAxis[Index], pen=interfacing.ChannelLineArr[Index].GetColour(), skipFiniteCheck=True)
 
@@ -229,6 +232,9 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             self.timer.start()
         interfacing.printDebug("PauseToggle")
+
+    def ToggleHide(self, Checked):
+        interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].IsHidden = Checked
 
     def horizontalScrollBarFunction(self, Input):
         self.ValueHorizontal = Input
@@ -274,10 +280,12 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.SignalArray, fs=FS, window='hanning', nfft=256, noverlap=128, detrend=False, mode='magnitude', scaling='density')
 
             self.max_freq = np.max(self.freqs)
-            self.axes.set_ylim([interfacing.FreqRangeMin, interfacing.FreqRangeMax])
-            self.axes.pcolormesh(self.times, self.freqs  , self.Sx, cmap = interfacing.SpectroTheme)
-            self.axes.set_ylabel('Frequency [kHz]', color = 'white')
-            self.axes.set_xlabel('Time [s]', color = 'white')
+            self.axes.set_ylim(
+                [interfacing.FreqRangeMin, interfacing.FreqRangeMax])
+            self.axes.pcolormesh(self.times, self.freqs,
+                                 self.Sx, cmap=interfacing.SpectroTheme)
+            self.axes.set_ylabel('Frequency [kHz]', color='white')
+            self.axes.set_xlabel('Time [s]', color='white')
             self.Spectrogram.draw()
             self.figure.canvas.draw()
 
