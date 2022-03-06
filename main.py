@@ -73,14 +73,14 @@ class MainWindow(QtWidgets.QMainWindow):
         filetype = path[len(path)-3:]  # gets last 3 letters of path
 
         if filetype == "hea" or filetype == "rec" or filetype == "dat":
-            self.record = wfdb.rdrecord(path[:-4], channels=[0])
+            self.record = wfdb.rdrecord(path[:-4], channels=[1])
             #self.d_signal = self.record.adc()
             #TempArrX = self.d_signal[:][1]
             TempArrY = self.record.p_signal
-            TempArrY2 = np.concatenate(TempArrY)
+            TempArrY = np.concatenate(TempArrY)
             print(self.record.fs)
-            print(TempArrY2)
-            for Index in range(len(TempArrY2)):
+            print(TempArrY)
+            for Index in range(len(TempArrY)):
                 TempArrX.append(Index/self.record.fs)
 
         if filetype == "csv" or filetype == "txt" or filetype == "xls":
