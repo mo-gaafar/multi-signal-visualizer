@@ -101,10 +101,10 @@ class PlotterWindow:
         self.YAxisRange = YAxisRange  # Tuple containing min/max ranges
         self.XAxisRange = XAxisRange
 
-        self.CineSpeed = 50/3
+        self.CineSpeed = 50
 
     def UpdateCineSpeed(self, Input):
-            self.CineSpeed = (50/3) / (Input/100)
+            self.CineSpeed = (50) / (Input/100)
         #MainWindow.timer = QtCore.QTimer()
         #MainWindow.timer.setInterval(100*self.CineSpeed)
 
