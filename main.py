@@ -24,10 +24,10 @@ import time
 
 from wfdb.io.record import rdrecord
 
-import pyqtgraph.exporters 
+import pyqtgraph.exporters
 import pandas
 import statistics
-from PyQt5.QtWidgets import * 
+from PyQt5.QtWidgets import *
 from fpdf import FPDF
 from pyqtgraph.GraphicsScene import exportDialog
 #from PDF import PDF
@@ -74,24 +74,20 @@ class MainWindow(QtWidgets.QMainWindow):
         self.PauseToggleVar = False
         self.HoldVarH = False
         self.HoldVarV = False
-        self.xAxis = [0,0,0]
-        self.yAxis = [0,0,0]
-        
-        self.LineReferenceArr = [self.Plot.plot(self.xAxis,self.yAxis), self.Plot.plot(self.xAxis,self.yAxis), self.Plot.plot(self.xAxis, self.yAxis)]
+        self.xAxis = [0, 0, 0]
+        self.yAxis = [0, 0, 0]
 
-        #new Variables ABDULLAH
+        self.LineReferenceArr = [self.Plot.plot(self.xAxis, self.yAxis), self.Plot.plot(
+            self.xAxis, self.yAxis), self.Plot.plot(self.xAxis, self.yAxis)]
+
+        # new Variables ABDULLAH
         self.amplitude = [[], [], []]
         self.time = [[], [], []]
         self.pointsToAppend = 0
-        #a list of images of the graphs (use for create_pdf)
+        # a list of images of the graphs (use for create_pdf)
         self.list = []
-        #a list of images of the spectrograms (use for create_pdf)
+        # a list of images of the spectrograms (use for create_pdf)
         self.spectroImg_list = [None]
-        
-        
-    
- 
-
 
     def Browse(self):
         self.filename = QFileDialog.getOpenFileName(
@@ -166,10 +162,11 @@ class MainWindow(QtWidgets.QMainWindow):
         #     self.amplitude), yMax=max(self.amplitude))  # limit bata3 al axis ali 3andi
         MinY = -1  # Placeholder
         interfacing.printDebug("MaxX: " + str(MaxX))
-        self.Plot.plotItem.setLimits(xMin=0, xMax=MaxX, yMin=MinY, yMax=MaxY)  # limit bata3 al axis ali 3andi
-        self.pointsToAppend = 0  # Plotted Points counter 
+        # limit bata3 al axis ali 3andi
+        self.Plot.plotItem.setLimits(xMin=0, xMax=MaxX, yMin=MinY, yMax=MaxY)
+        self.pointsToAppend = 0  # Plotted Points counter
 
-         # Initialize Qt Timer
+        # Initialize Qt Timer
         self.timer = QtCore.QTimer()
         self.timer.setInterval(50)  # Overflow timer
         self.timer.timeout.connect(self.update_plot_data)  # Event handler
@@ -197,12 +194,13 @@ class MainWindow(QtWidgets.QMainWindow):
         # TODO: if the shortest signal ends stop the timer
 
         # DEBUGGING LOOP
-        for Index in range(3):
-            if interfacing.ChannelLineArr[Index].Filepath != "null":
-                interfacing.printDebug("Channel number: " + str(Index))
-                interfacing.printDebug(
-                    len(interfacing.ChannelLineArr[Index].Time))
-                interfacing.printDebug(len(self.xAxis[Index]))
+        # for Index in range(3):
+        #     if interfacing.ChannelLineArr[Index].Filepath != "null":
+        #         interfacing.printDebug("Channel number: " + str(Index))
+        #         interfacing.printDebug(
+        #             len(interfacing.ChannelLineArr[Index].Time))
+        #         interfacing.printDebug(len(self.xAxis[Index]))
+
         self.horizontalScrollBarFunction()
         self.verticalScrollBarFunction()
         #interfacing.printDebug("Minimum signal length: " + str(MinSignalLen))
@@ -211,27 +209,17 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # TODO: Set y limits based on all plottable signals
 
-        # TODO: to be embedded as in the class plotwindow
-        # VisibleYRange = (0,0)
-        # VisibleXRange = (0,0)
-      
-       
-            
-
-        #TODO: fix this 
-     
-       
-        #Plots all signals
-        for Index in range(3): #TODO: make this variable later.;
+        # Plots all signals
+        for Index in range(3):  # TODO: make this variable later.;
             if interfacing.ChannelLineArr[Index].Filepath != "null":
-                #TODO: signal should be time indexed
-                #self.PlotWidget.setData(
-                    #self.xAxis[0], self.yAxis[Index], pen=interfacing.ChannelLineArr[Index].GetColour(), skipFiniteCheck=True)
-                self.LineReferenceArr[Index].setData(self.xAxis[0], self.yAxis[Index], pen=interfacing.ChannelLineArr[Index].GetColour(), skipFiniteCheck=True)
+                # TODO: signal should be time indexed
+                # self.PlotWidget.setData(
+                # self.xAxis[0], self.yAxis[Index], pen=interfacing.ChannelLineArr[Index].GetColour(), skipFiniteCheck=True)
+                self.LineReferenceArr[Index].setData(
+                    self.xAxis[0], self.yAxis[Index], pen=interfacing.ChannelLineArr[Index].GetColour(), skipFiniteCheck=True)
 
 #-----------------------------------------------------------------------------------------------------------------------------------------------#
-    # def ExportPDF(self):  
-
+    # def ExportPDF(self):
 
     #     if self.pointsToAppend == 0:
     #         QtWidgets.QMessageBox.warning(
@@ -246,46 +234,44 @@ class MainWindow(QtWidgets.QMainWindow):
     #    #create a picture of the signal
     #         ex3 = pg.exporters.ImageExporter(self.Plot.plotItem)
     #         ex3.export('test.png')
-       
+
     #     self.list = ['test.png']
     #     self.create_pdf()
-   
+
     # def create_pdf(self):
     #     #the function that creates the pdf report
-        
+
     #     pdf = FPDF()
-        
+
     #     for index in range(1):
     #         # set pdf title
     #         pdf.add_page()
     #         pdf.set_font('Arial', 'B', 15)
     #         pdf.cell(70)
     #         pdf.cell(60, 10, 'Siganl Viewer Report', 1, 0, 'C')
-        
-            
+
     #         pdf.ln(20)
-            
+
     #         # put the graphs on the pdf
     #         pdf.image(self.list[index], 10, 50, 190, 50)
     #        # pdf.image(self.spectroImg_list[index], 10, 110, 190, 100)
     #         pdf.drawString(50,380,'Spectrogram:')
     #         pdf.drawImage('sp'+str+'.png', 120, 80, width = 380 , height = 288)
 
-            
-    #     pdf.output("report.pdf", "F")    
+    #     pdf.output("report.pdf", "F")
     #     #pdf.export('pdf.pdf')
-        
+
     #     # #removes the graphs pictures as we dont need
     #     os.remove("test.png")
     #     os.remove("test.csv")
     #     os.remove("test.svg")
-        
+
         # os.remove("fileName2.png")
         # os.remove("fileName3.png")
         # os.remove("spectro1.png")
         # os.remove("spectro2.png")
         # os.remove("spectro3.png")
-       
+
         # Folder Dialog (failed attempt)
         # QFileDialog.setFileMode(self, Directory)
         # QFileDialog.setOption(self, DirSelectDialog)
@@ -298,10 +284,22 @@ class MainWindow(QtWidgets.QMainWindow):
         # Step 3 create report with required variables and formatting
         # Step 4 save in selected folder location (step 1)
 #-----------------------------------------------------------------------------------------------------------------------------------------------#
-   
-    
+
+
 #-----------------------------------------------------------------------------------------------------------------------------------------------#
     # OPENS COLOUR DIALOG WHEN BUTTON IS PRESSED
+
+    def DynamicUpdate(self):
+        for Index in range(3):  # TODO: make this variable later
+            if interfacing.ChannelLineArr[Index].Filepath != "null":
+                if interfacing.ChannelLineArr[Index].IsHidden == True:
+                    self.LineReferenceArr[Index].hide()
+                else:
+                    self.LineReferenceArr[Index].show()
+
+                self.LineReferenceArr[Index].setData(
+                    self.xAxis[0], self.yAxis[Index], pen=interfacing.ChannelLineArr[Index].GetColour(), name=interfacing.ChannelLineArr[Index].Label, skipFiniteCheck=True)
+
     def SelectSignalColour(self):
         self.SignalColour = QColorDialog.getColor().name()
         return self.SignalColour
@@ -321,67 +319,67 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             self.timer.start()
         interfacing.printDebug("PauseToggle")
-        self.DynamicUpdate()
+        # self.DynamicUpdate()
 
     def ToggleHide(self, Checked):
         interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].IsHidden = Checked
         self.DynamicUpdate()
 
-
     def horizontalScrollBarFunction(self):
-        
+
         self.ValueHorizontal = self.horizontalScrollBar.value()
 
-        if self.HoldVarH == True:  #law al value bata3 al scroll at8yar dah ma3nah ano 3aiz maymshesh ma3a al line  
-            self.Plot.plotItem.setXRange(interfacing.ChannelLineArr[0].Time[self.ValueHorizontal]-1.0,interfacing.ChannelLineArr[0].Time[self.ValueHorizontal])
+        if self.HoldVarH == True:  # law al value bata3 al scroll at8yar dah ma3nah ano 3aiz maymshesh ma3a al line
+            self.Plot.plotItem.setXRange(
+                interfacing.ChannelLineArr[0].Time[self.ValueHorizontal]-1.0, interfacing.ChannelLineArr[0].Time[self.ValueHorizontal])
         else:
-            self.Plot.plotItem.setXRange(max(self.xAxis[0], default=0)-1.0, max(self.xAxis[0], default=0))
-            self.ValueHorizontal = self.horizontalScrollBar.setValue(max(self.xAxis[0], default=0)*2000)
+            self.Plot.plotItem.setXRange(
+                max(self.xAxis[0], default=0)-1.0, max(self.xAxis[0], default=0))
+            self.ValueHorizontal = self.horizontalScrollBar.setValue(
+                max(self.xAxis[0], default=0)*2000)
 
-
-            
-        
         self.horizontalScrollBar.setMinimum(0)
-        self.horizontalScrollBar.setMaximum(len(interfacing.ChannelLineArr[0].Time))
+        self.horizontalScrollBar.setMaximum(
+            len(interfacing.ChannelLineArr[0].Time))
         self.horizontalScrollBar.setSingleStep(20)
-        
-         
-        interfacing.printDebug("Horizontal Scroll: " + str(self.ValueHorizontal))
 
-    def IsHeldH (self):
-        self.HoldVarH = True  #mamsoka
+        interfacing.printDebug("Horizontal Scroll: " +
+                               str(self.ValueHorizontal))
+
+    def IsHeldH(self):
+        self.HoldVarH = True  # mamsoka
 
     def NotHeldH(self):
-        self.HoldVarH = False #atsabat
+        self.HoldVarH = False  # etsabet
 
-    def IsHeldV (self):
-        self.HoldVarV = True  #mamsoka 
+    def IsHeldV(self):
+        self.HoldVarV = True  # mamsoka
 
     def NotHeldV(self):
-        self.HoldVarV = False #atsabat
-
+        self.HoldVarV = False  # etsabet
 
     def verticalScrollBarFunction(self):
         self.ValueVertical = self.verticalScrollBar.value()
-         
-        
 
-        if self.HoldVarV == True:  #law al value bata3 al scroll at8yar dah ma3nah ano 3aiz maymshesh ma3a al line  
-            if self.ValueVertical<(len(interfacing.ChannelLineArr[0].Amplitude)/2.0): #tala3 fo2
+        if self.HoldVarV == True:  # law al value bata3 al scroll at8yar dah ma3nah ano 3aiz maymshesh ma3a al line
+            # tala3 fo2
+            if self.ValueVertical < (len(interfacing.ChannelLineArr[0].Amplitude)/2.0):
 
-                self.Plot.plotItem.setYRange(min(interfacing.ChannelLineArr[0].Amplitude[:self.ValueVertical], default=0)+0.1,max(interfacing.ChannelLineArr[0].Amplitude[:self.ValueVertical], default=0)) #TAKECARE:hasabat al range hena (n)
-            else:                                                                       #nazal ta7t
-                self.Plot.plotItem.setYRange(min(interfacing.ChannelLineArr[0].Amplitude[:self.ValueVertical], default=0),max(interfacing.ChannelLineArr[0].Amplitude[:self.ValueVertical], default=0)-0.1)
+                self.Plot.plotItem.setYRange(min(interfacing.ChannelLineArr[0].Amplitude[:self.ValueVertical], default=0)+0.1, max(
+                    interfacing.ChannelLineArr[0].Amplitude[:self.ValueVertical], default=0))  # TAKECARE:hasabat al range hena (n)
+            else:  # nazal ta7t
+                self.Plot.plotItem.setYRange(min(interfacing.ChannelLineArr[0].Amplitude[:self.ValueVertical], default=0), max(
+                    interfacing.ChannelLineArr[0].Amplitude[:self.ValueVertical], default=0)-0.1)
 
         else:
-            self.Plot.plotItem.setYRange(min(self.yAxis[0], default=0), max(self.yAxis[0], default=0)) #TAKECARE:hasabat al range hena
-            self.ValueVertical = self.verticalScrollBar.setValue(len(interfacing.ChannelLineArr[0].Amplitude)/2.0)  #at amplitude=0
+            self.Plot.plotItem.setYRange(min(self.yAxis[0], default=0), max(
+                self.yAxis[0], default=0))  # TAKECARE:hasabat al range hena
+            self.ValueVertical = self.verticalScrollBar.setValue(
+                len(interfacing.ChannelLineArr[0].Amplitude)/2.0)  # at amplitude=0
 
-
-            
-        
         self.verticalScrollBar.setMinimum(0)
-        self.verticalScrollBar.setMaximum(len(interfacing.ChannelLineArr[0].Amplitude))
+        self.verticalScrollBar.setMaximum(
+            len(interfacing.ChannelLineArr[0].Amplitude))
         self.verticalScrollBar.setSingleStep(20)
         interfacing.printDebug("Vertical Scroll: " + str(self.ValueVertical))
 
@@ -439,12 +437,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
             self.Spectrogram.draw()
             self.figure.canvas.draw()
-#Making a picture of the spectrogram to use it the pdf 
+# Making a picture of the spectrogram to use it the pdf
             plt.savefig('Spectrogram.png')
 
-            
-           
- 
     def SetSpectroSelectedIndex(self, Input):
         interfacing.SpectroSelectedIndex = Input
         self.plotSpectro()
@@ -470,87 +465,81 @@ class MainWindow(QtWidgets.QMainWindow):
         self.plotSpectro()
         interfacing.printDebug(MinOrMax + "SpectroSlider: " + str(Input))
 #--------------------------------------------------------------- Table FUNCTIONS ---------------------------------------------------------------------------------------------------#
+
     def createTable(self):
         self.tableWidget = QTableWidget()
-  
-        #Row count
-        self.tableWidget.setRowCount(4) 
-  
-        #Column count
-        self.tableWidget.setColumnCount(2)  
-  
-        self.tableWidget.setItem(0,0, QTableWidgetItem(min))
-        self.tableWidget.setItem(0,1, QTableWidgetItem(max))
-        self.tableWidget.setItem(1,0, QTableWidgetItem("Aloysius"))
-        self.tableWidget.setItem(1,1, QTableWidgetItem("Indore"))
-        self.tableWidget.setItem(2,0, QTableWidgetItem("Alan"))
-        self.tableWidget.setItem(2,1, QTableWidgetItem("Bhopal"))
-        self.tableWidget.setItem(3,0, QTableWidgetItem("Arnavi"))
-        self.tableWidget.setItem(3,1, QTableWidgetItem("Mandsaur"))
+
+        # Row count
+        self.tableWidget.setRowCount(4)
+
+        # Column count
+        self.tableWidget.setColumnCount(2)
+
+        self.tableWidget.setItem(0, 0, QTableWidgetItem(min))
+        self.tableWidget.setItem(0, 1, QTableWidgetItem(max))
+        self.tableWidget.setItem(1, 0, QTableWidgetItem("Aloysius"))
+        self.tableWidget.setItem(1, 1, QTableWidgetItem("Indore"))
+        self.tableWidget.setItem(2, 0, QTableWidgetItem("Alan"))
+        self.tableWidget.setItem(2, 1, QTableWidgetItem("Bhopal"))
+        self.tableWidget.setItem(3, 0, QTableWidgetItem("Arnavi"))
+        self.tableWidget.setItem(3, 1, QTableWidgetItem("Mandsaur"))
 
 #--------------------------------------------------------------- EXPORT FUNCTIONS --------------------------------------------------------------------------------------------------#
-   # def ExportPDF(self):  
-      #  kugu
-   
-   
-#-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#  
-   
-   
-   
-   
-    def ExportPDF(self):  
 
-#TODO make the messages valid 
+    def ExportPDF(self):
+
+        # TODO make the messages valid
         if self.pointsToAppend == 0:
             QtWidgets.QMessageBox.warning(
                 self, 'NO SIGNAL ', 'You have to plot a signal first')
-        elif self.pointsToAppend != 0  :
+        elif self.pointsToAppend != 0:
             QtWidgets.QMessageBox.information(
                 self, 'Done', 'PDF has been created')
-       #create a CSV file of the signal
+       # create a CSV file of the signal
             ex1 = pg.exporters.CSVExporter(self.Plot.plotItem)
             ex1.export('test.csv')
-       #create a excell sheet of the signal
+       # create a excell sheet of the signal
             ex2 = pg.exporters.SVGExporter(self.Plot.plotItem)
             ex2.export('test.svg')
-       #create a picture of the signal
+       # create a picture of the signal
             ex3 = pg.exporters.ImageExporter(self.Plot.plotItem)
             ex3.export('test.png')
-       #put the picture of the signal in an array 
+       # put the picture of the signal in an array
         self.list = ['test.png']
-        #call the function create_pdf()
-        
+        # call the function create_pdf()
+
         self.create_pdf()
 
-#--------------------------------------------------------------------------------CREATE TABLE------------------------------------------------------------#    
- 
+#--------------------------------------------------------------------------------CREATE TABLE------------------------------------------------------------#
+
     def createTable(self):
         self.tableWidget = QTableWidget()
-  
-        #Row count
-        self.tableWidget.setRowCount(4) 
-  
-        #Column count
-        self.tableWidget.setColumnCount(2)  
-  
-        self.tableWidget.setItem(0,0, QTableWidgetItem("Name"))
-        self.tableWidget.setItem(0,1, QTableWidgetItem("City"))
-        self.tableWidget.setItem(1,0, QTableWidgetItem("Aloysius"))
-        self.tableWidget.setItem(1,1, QTableWidgetItem("Indore"))
-        self.tableWidget.setItem(2,0, QTableWidgetItem("Alan"))
-        self.tableWidget.setItem(2,1, QTableWidgetItem("Bhopal"))
-        self.tableWidget.setItem(3,0, QTableWidgetItem("Arnavi"))
-        self.tableWidget.setItem(3,1, QTableWidgetItem("Mandsaur"))
+
+        # Row count
+        self.tableWidget.setRowCount(4)
+
+        # Column count
+        self.tableWidget.setColumnCount(2)
+
+        self.tableWidget.setItem(0, 0, QTableWidgetItem("Name"))
+        self.tableWidget.setItem(0, 1, QTableWidgetItem("City"))
+        self.tableWidget.setItem(1, 0, QTableWidgetItem("Aloysius"))
+        self.tableWidget.setItem(1, 1, QTableWidgetItem("Indore"))
+        self.tableWidget.setItem(2, 0, QTableWidgetItem("Alan"))
+        self.tableWidget.setItem(2, 1, QTableWidgetItem("Bhopal"))
+        self.tableWidget.setItem(3, 0, QTableWidgetItem("Arnavi"))
+        self.tableWidget.setItem(3, 1, QTableWidgetItem("Mandsaur"))
 
         self.create_pdf()
-  #-----------------------------------------------------------------------------------------------------------------------------------#  
-  
+  #-----------------------------------------------------------------------------------------------------------------------------------#
+
     def create_pdf(self):
-        #the function that creates the pdf report
-        pdname = QFileDialog.getSaveFileUrl(None, str('Save the signal file'), None, str("PDF FIles(*.pdf)"))
+        # the function that creates the pdf report
+        pdname = QFileDialog.getSaveFileUrl(
+            None, str('Save the signal file'), None, str("PDF FIles(*.pdf)"))
         print(self.pdname[0])
-        
-        if pdname !='':
+
+        if pdname != '':
             pdf = FPDF()
             # set pdf title
             pdf.add_page()
@@ -560,29 +549,20 @@ class MainWindow(QtWidgets.QMainWindow):
             pdf.ln(5)
            # pdf.cell(60, 10, 'Abdullah', 0, 0, 'L')
 
-            
             pdf.ln(20)
-            
+
             # put the graphs on the pdf
-            pdf.image('Desgin/CUFE.png',1,1,50,40)
-            pdf.image('Desgin/logo.png',160,1,50,40)
+            pdf.image('Desgin/CUFE.png', 1, 1, 50, 40)
+            pdf.image('Desgin/logo.png', 160, 1, 50, 40)
 
             pdf.image('test.png', 40, 50, 100, 100)
             pdf.image('Spectrogram.png', 40, 160, 100, 100)
             pdf.output(str(pdname[0]))
-            #pdf.image()
-            
-     
-    
-        
+            # pdf.image()
 
         # path = self.filename
-        
 
-        
-            
-        
-        #removes the graphs pictures as we dont need
+        # removes the graphs pictures as we dont need
         os.remove("test.png")
         os.remove("test.csv")
         os.remove("test.svg")

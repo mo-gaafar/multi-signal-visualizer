@@ -6,4 +6,5 @@
 /.vs/slnx.sqlite
 /.vs
 /__pycache__
-.vs/slnx.sqlite
+/.vs/slnx.sqlite
+/slnx.sqlite

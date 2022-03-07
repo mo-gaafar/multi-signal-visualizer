@@ -159,9 +159,9 @@ def initConnectors(self):
     self.SignalColour.clicked.connect(
         lambda: ChannelLineArr[SignalSelectedIndex].UpdateColour())
 
-    self.ShowHide = self.findChild(QCheckBox, "ShowHide")
-    self.ShowHide.stateChanged.connect(
-        lambda: ChannelLineArr[SignalSelectedIndex].UpdateHide())
+    # self.ShowHide = self.findChild(QCheckBox, "ShowHide")
+    # self.ShowHide.stateChanged.connect(
+    #     lambda: ChannelLineArr[SignalSelectedIndex].UpdateHide())
 
     self.ThemesMenu = self.findChild(QComboBox, "ThemesMenu")
     self.ThemesMenu.currentIndexChanged.connect(lambda: MainWindow.SetSpectroTheme(
