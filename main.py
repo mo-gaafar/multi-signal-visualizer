@@ -43,7 +43,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.PlotterWindowProp = interfacing.PlotterWindow()
         self.PauseToggleVar = False
-
+        self.HoldVarH = False
+        self.HoldVarV = False
         self.xAxis = [0,0,0]
         self.yAxis = [0,0,0]
         
@@ -107,13 +108,16 @@ class MainWindow(QtWidgets.QMainWindow):
         MinY = -1 #Placeholder
         interfacing.printDebug("MaxX: " + str(MaxX))
         self.Plot.plotItem.setLimits(xMin=0, xMax=MaxX, yMin=MinY, yMax=MaxY)  # limit bata3 al axis ali 3andi
-        self.pointsToAppend = 0  # Plotted Points counter
+        self.pointsToAppend = 0  # Plotted Points counter 
 
-        # Initialize Qt Timer
+         # Initialize Qt Timer
         self.timer = QtCore.QTimer()
         self.timer.setInterval(150)  # Overflow timer
         self.timer.timeout.connect(self.update_plot_data)  # Event handler
         self.timer.start()  # Start timer
+
+        
+       
           
     # def InitDataPoints(self):
 
@@ -145,10 +149,13 @@ class MainWindow(QtWidgets.QMainWindow):
                 interfacing.printDebug("Channel number: " + str(Index))
                 interfacing.printDebug(len(interfacing.ChannelLineArr[Index].Time))
                 interfacing.printDebug(len(self.xAxis[Index]))
-        
+        self.horizontalScrollBarFunction()
+        self.verticalScrollBarFunction()
         #interfacing.printDebug("Minimum signal length: " + str(MinSignalLen))
         if self.pointsToAppend > self.MinSignalLen:
             self.timer.stop()
+            
+            
 
         # if self.time[self.pointsToAppend] > 1:   #1 because this where our axis stops at at the begings to evry time we need to update the axis inorder for it to plot dynamiclly
         # self.Plot.setLimits(xMax=max(self.x, default=0))
@@ -159,20 +166,23 @@ class MainWindow(QtWidgets.QMainWindow):
         # TODO: to be embedded as in the class plotwindow
         # VisibleYRange = (0,0)
         # VisibleXRange = (0,0)
+      
+       
+            
 
         #TODO: fix this 
-        self.Plot.plotItem.setXRange(max(self.xAxis[0], default=0)-1.0, max(self.xAxis[0], default=0))
-
-        for Index in range(3):
-            self.LineReferenceArr[Index].
-
+     
+       
         #Plots all signals
-        for Index in range(3): #TODO: make this variable later
+        for Index in range(3): #TODO: make this variable later.;
             if interfacing.ChannelLineArr[Index].Filepath != "null":
                 #TODO: signal should be time indexed
                 #self.PlotWidget.setData(
                     #self.xAxis[0], self.yAxis[Index], pen=interfacing.ChannelLineArr[Index].GetColour(), skipFiniteCheck=True)
                 self.LineReferenceArr[Index].setData(self.xAxis[0], self.yAxis[Index], pen=interfacing.ChannelLineArr[Index].GetColour(), skipFiniteCheck=True)
+                
+          
+
 
     def ExportPDF(self):
         # Folder Dialog (failed attempt)
@@ -193,9 +203,11 @@ class MainWindow(QtWidgets.QMainWindow):
         return self.SignalColour
 
     def ZoomInFunction(self):
+        self.Plot.plotItem.getViewBox().scaleBy((0.5, 0.5))
         interfacing.printDebug("Zoomin")
 
     def ZoomOutFunction(self):
+        self.Plot.plotItem.getViewBox().scaleBy((1.5, 1.5))
         interfacing.printDebug("Zoomout")
 
     def TogglePause(self):
@@ -206,12 +218,61 @@ class MainWindow(QtWidgets.QMainWindow):
             self.timer.start()
         interfacing.printDebug("PauseToggle")
 
-    def horizontalScrollBarFunction(self,Input):
-        self.ValueHorizontal = Input
+    def horizontalScrollBarFunction(self):
+        
+        self.ValueHorizontal = self.horizontalScrollBar.value()
+
+        if self.HoldVarH == True:  #law al value bata3 al scroll at8yar dah ma3nah ano 3aiz maymshesh ma3a al line  
+            self.Plot.plotItem.setXRange(interfacing.ChannelLineArr[0].Time[self.ValueHorizontal]-1.0,interfacing.ChannelLineArr[0].Time[self.ValueHorizontal])
+        else:
+            self.Plot.plotItem.setXRange(max(self.xAxis[0], default=0)-1.0, max(self.xAxis[0], default=0))
+            self.ValueHorizontal = self.horizontalScrollBar.setValue(max(self.xAxis[0], default=0)*2000)
+
+
+            
+        
+        self.horizontalScrollBar.setMinimum(0)
+        self.horizontalScrollBar.setMaximum(len(interfacing.ChannelLineArr[0].Time))
+        self.horizontalScrollBar.setSingleStep(20)
+        
+         
         interfacing.printDebug("Horizontal Scroll: " + str(self.ValueHorizontal))
 
-    def verticalScrollBarFunction(self,Input):
-        self.ValueVertical = Input
+    def IsHeldH (self):
+        self.HoldVarH = True  #mamsoka
+
+    def NotHeldH(self):
+        self.HoldVarH = False #atsabat
+
+    def IsHeldV (self):
+        self.HoldVarV = True  #mamsoka 
+
+    def NotHeldV(self):
+        self.HoldVarV = False #atsabat
+
+
+    def verticalScrollBarFunction(self):
+        self.ValueVertical = self.verticalScrollBar.value()
+         
+        
+
+        if self.HoldVarV == True:  #law al value bata3 al scroll at8yar dah ma3nah ano 3aiz maymshesh ma3a al line  
+            if self.ValueVertical<(len(interfacing.ChannelLineArr[0].Amplitude)/2.0): #tala3 fo2
+
+                self.Plot.plotItem.setYRange(min(interfacing.ChannelLineArr[0].Amplitude[:self.ValueVertical], default=0)+0.1,max(interfacing.ChannelLineArr[0].Amplitude[:self.ValueVertical], default=0)) #TAKECARE:hasabat al range hena (n)
+            else:                                                                       #nazal ta7t
+                self.Plot.plotItem.setYRange(min(interfacing.ChannelLineArr[0].Amplitude[:self.ValueVertical], default=0),max(interfacing.ChannelLineArr[0].Amplitude[:self.ValueVertical], default=0)-0.1)
+
+        else:
+            self.Plot.plotItem.setYRange(min(self.yAxis[0], default=0), max(self.yAxis[0], default=0)) #TAKECARE:hasabat al range hena
+            self.ValueVertical = self.verticalScrollBar.setValue(len(interfacing.ChannelLineArr[0].Amplitude)/2.0)  #at amplitude=0
+
+
+            
+        
+        self.verticalScrollBar.setMinimum(0)
+        self.verticalScrollBar.setMaximum(len(interfacing.ChannelLineArr[0].Amplitude))
+        self.verticalScrollBar.setSingleStep(20)
         interfacing.printDebug("Vertical Scroll: " + str(self.ValueVertical))
     
     def SpeedSliderFunction(self,Input):
