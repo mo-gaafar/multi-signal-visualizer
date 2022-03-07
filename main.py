@@ -159,12 +159,9 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.xAxis[ChannelIndex] = interfacing.ChannelLineArr[ChannelIndex].Time[:self.pointsToAppend]
                 self.yAxis[ChannelIndex] = interfacing.ChannelLineArr[ChannelIndex].Amplitude[:self.pointsToAppend]
 
-        # interfacing.printDebug(self.xAxis[0])
         self.pointsToAppend += 5
-        # if self.pointsToAppend > len(self.time):
-        #     self.timer.stop()
+
         # TODO: if the shortest signal ends stop the timer
-        #MinSignalLen = min(map(len, interfacing.ChannelLineArr.Time))
 
         # DEBUGGING LOOP
         for Index in range(3):
@@ -178,28 +175,22 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.pointsToAppend > self.MinSignalLen:
             self.timer.stop()
 
-        # if self.time[self.pointsToAppend] > 1:   #1 because this where our axis stops at at the begings to evry time we need to update the axis inorder for it to plot dynamiclly
-        # self.Plot.setLimits(xMax=max(self.x, default=0))
-
         # TODO: Set y limits based on all plottable signals
 
         # TODO: fix this
         self.Plot.plotItem.setXRange(
             max(self.xAxis[0], default=0)-1.0, max(self.xAxis[0], default=0))
-
+        #self.Plot.plotItem.legend.addItem("batee5", "brengan")
         # Plots all signals
         for Index in range(3):  # TODO: make this variable later
             if interfacing.ChannelLineArr[Index].Filepath != "null":
-                # TODO: signal should be time indexed
-                # self.PlotWidget.setData(
-                # self.xAxis[0], self.yAxis[Index], pen=interfacing.ChannelLineArr[Index].GetColour(), skipFiniteCheck=True)
                 if interfacing.ChannelLineArr[Index].IsHidden == True:
                     self.LineReferenceArr[Index].hide()
                 else:
                     self.LineReferenceArr[Index].show()
 
                 self.LineReferenceArr[Index].setData(
-                    self.xAxis[0], self.yAxis[Index], pen=interfacing.ChannelLineArr[Index].GetColour(), skipFiniteCheck=True)
+                    self.xAxis[0], self.yAxis[Index], pen=interfacing.ChannelLineArr[Index].GetColour(), name=interfacing.ChannelLineArr[Index].Label, skipFiniteCheck=True)
 
     def ExportPDF(self):
         # Folder Dialog (failed attempt)
