@@ -30,7 +30,7 @@ ChannelLineArr = []
 # Global Interface Variables
 LabelTextBox = "null"
 FreqRangeMin = 0
-FreqRangeMax = 15
+FreqRangeMax = 200
 
 
 # TODO: add themes here somehow? create theme object or dictionary?
@@ -195,22 +195,30 @@ def initConnectors(self):
     # call UpdateCineSpeed() on change
 
     # Spectrogram Frequency Range Sliders
-    self.MinRangeSlider = self.findChild(QSlider, "MinRangeSlider")
-    self.MinRangeSlider.sliderReleased.connect(
-        lambda: self.SpectrogramFrequency(self.MinRangeSlider.value(), "min"))
-
-    self.MaxRangeSlider = self.findChild(QSlider, "MaxRangeSlider")
-    self.MaxRangeSlider.sliderReleased.connect(
-        lambda: self.SpectrogramFrequency(self.MaxRangeSlider.value(), "max"))
 
     self.SpeedLCD = self.findChild(QLCDNumber, "SpeedLCD")
     self.SpeedSlider.valueChanged.connect(
         lambda: self.SpeedLCD.display(round((self.SpeedSlider.value()/100)*4)/4))
 
+def initSpectroRangeSliders(self):
+    self.MinRangeSlider = self.findChild(QSlider, "MinRangeSlider")
+    self.MinRangeSlider.setMaximum(FreqRangeMax)
+    self.MinRangeSlider.setValue(0)
+    self.MinRangeSlider.sliderReleased.connect(
+        lambda: self.SpectrogramFrequency(self.MinRangeSlider.value(), "min"))
+
+    self.MaxRangeSlider = self.findChild(QSlider, "MaxRangeSlider")
+    self.MaxRangeSlider.setMaximum(FreqRangeMax)
+    self.MaxRangeSlider.setValue(FreqRangeMax)
+    self.MaxRangeSlider.sliderReleased.connect(
+        lambda: self.SpectrogramFrequency(self.MaxRangeSlider.value(), "max"))
+
     self.MinLCD = self.findChild(QLCDNumber, "MinLCD")
+    self.MinLCD.display(FreqRangeMin)
     self.MinRangeSlider.valueChanged.connect(
         lambda: self.MinLCD.display(self.MinRangeSlider.value()))
 
     self.MaxLCD = self.findChild(QLCDNumber, "MaxLCD")
+    self.MaxLCD.display(FreqRangeMax)
     self.MaxRangeSlider.valueChanged.connect(
         lambda: self.MaxLCD.display(self.MaxRangeSlider.value()))
