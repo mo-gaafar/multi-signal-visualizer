@@ -187,12 +187,26 @@ def initConnectors(self):
     self.horizontalScrollBar = self.findChild(
         QScrollBar, "horizontalScrollBar")
     self.horizontalScrollBar.valueChanged.connect(
-        lambda: self.horizontalScrollBarFunction(self.horizontalScrollBar.value()))
+        lambda: self.horizontalScrollBarFunction())
+      
+    self.horizontalScrollBar.sliderMoved.connect(
+        lambda: self.IsHeldH())
 
-    self.verticalScrollBar = self.findChild(QScrollBar, "verticalScrollBar")
+    self.horizontalScrollBar.sliderReleased.connect(
+        lambda: self.NotHeldH())
+
+   #vertical
+
+    self.verticalScrollBar = self.findChild(
+        QScrollBar, "verticalScrollBar")
     self.verticalScrollBar.valueChanged.connect(
-        lambda: self.verticalScrollBarFunction(self.verticalScrollBar.value()))
+        lambda: self.verticalScrollBarFunction())
+      
+    self.verticalScrollBar.sliderMoved.connect(
+        lambda: self.IsHeldV())
 
+    self.verticalScrollBar.sliderReleased.connect(
+        lambda: self.NotHeldV())
     # Cine speed slider
 
     self.SpeedSlider = self.findChild(QSlider, "SpeedSlider")
