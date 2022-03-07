@@ -51,7 +51,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Initialization functions
         interfacing.initConnectors(self)
-        #interfacing.initSpectroRangeSliders(self)
+        # interfacing.initSpectroRangeSliders(self)
         interfacing.initArrays(self)
         self.CreateSpectrogramFigure()
 
@@ -74,7 +74,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def OpenFile(self, path: str):
         TempArrX = []
         TempArrY = []
-        self.fsampling = 0
+        self.fsampling = 1
         filetype = path[len(path)-3:]  # gets last 3 letters of path
 
         if filetype == "hea" or filetype == "rec" or filetype == "dat":
@@ -82,10 +82,10 @@ class MainWindow(QtWidgets.QMainWindow):
             TempArrY = self.record.p_signal
             TempArrY = np.concatenate(TempArrY)
 
-            #print(self.record.fs)
+            # print(self.record.fs)
             self.fsampling = self.record.fs
             interfacing.FreqRangeMax = self.fsampling/2
-            #print(TempArrY)
+            # print(TempArrY)
 
             for Index in range(len(TempArrY)):
                 TempArrX.append(Index/self.record.fs)
@@ -187,15 +187,17 @@ class MainWindow(QtWidgets.QMainWindow):
             max(self.xAxis[0], default=0)-1.0, max(self.xAxis[0], default=0))
         #self.Plot.plotItem.legend.addItem("batee5", "brengan")
         # Plots all signals
-        for Index in range(3):  # TODO: make this variable later
-            if interfacing.ChannelLineArr[Index].Filepath != "null":
-                if interfacing.ChannelLineArr[Index].IsHidden == True:
-                    self.LineReferenceArr[Index].hide()
-                else:
-                    self.LineReferenceArr[Index].show()
+        # for Index in range(3):  # TODO: make this variable later
+        #     if interfacing.ChannelLineArr[Index].Filepath != "null":
+        #         if interfacing.ChannelLineArr[Index].IsHidden == True:
+        #             self.LineReferenceArr[Index].hide()
+        #         else:
+        #             self.LineReferenceArr[Index].show()
 
-                self.LineReferenceArr[Index].setData(
-                    self.xAxis[0], self.yAxis[Index], pen=interfacing.ChannelLineArr[Index].GetColour(), name=interfacing.ChannelLineArr[Index].Label, skipFiniteCheck=True)
+        #         self.LineReferenceArr[Index].setData(
+        #             self.xAxis[0], self.yAxis[Index], pen=interfacing.ChannelLineArr[Index].GetColour(), name=interfacing.ChannelLineArr[Index].Label, skipFiniteCheck=True)
+
+        self.DynamicUpdate()
 
     def ExportPDF(self):
         # Folder Dialog (failed attempt)
@@ -228,9 +230,12 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             self.timer.start()
         interfacing.printDebug("PauseToggle")
+        self.DynamicUpdate()
 
     def ToggleHide(self, Checked):
         interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].IsHidden = Checked
+        self.DynamicUpdate()
+
 
     def horizontalScrollBarFunction(self, Input):
         self.ValueHorizontal = Input
@@ -250,6 +255,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
 #------------------------------------------------------SPECTROGRAM FUNCTIONS------------------------------------------------------------------------------------#
 
+
     def CreateSpectrogramFigure(self):
         self.figure = plt.figure()                     # Create matplotlib fig
         self.figure.patch.set_facecolor('black')
@@ -268,7 +274,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.figure.canvas.draw()
 
         else:
-            if self.fsampling != 0:
+            if self.fsampling != 1:
                 FS = self.fsampling
 
             self.SignalArray = np.array(
@@ -280,14 +286,16 @@ class MainWindow(QtWidgets.QMainWindow):
             self.axes.set_ylim([0, self.max_freq])
 
             # Slices freq arr into range specified by sliders
-            self.freqRange = np.where((self.freq >= interfacing.FreqRangeMin) & (self.freq <= interfacing.FreqRangeMax))
+            self.freqRange = np.where((self.freq >= interfacing.FreqRangeMin) & (
+                self.freq <= interfacing.FreqRangeMax))
             self.freq = self.freq[self.freqRange]
             self.Sxx = self.Sxx[self.freqRange, :][0]
 
             # Plots Spectrogram
-            self.axes.pcolormesh(self.time, self.freq, 10*np.log10(self.Sxx), cmap = interfacing.SpectroTheme)
-            self.axes.set_ylabel('Frequency [Hz]', color = 'white')
-            self.axes.set_xlabel('Time [s]', color = 'white')
+            self.axes.pcolormesh(
+                self.time, self.freq, 10*np.log10(self.Sxx), cmap=interfacing.SpectroTheme)
+            self.axes.set_ylabel('Frequency [Hz]', color='white')
+            self.axes.set_xlabel('Time [s]', color='white')
             self.axes.set_yscale('symlog')
 
             self.Spectrogram.draw()
@@ -306,15 +314,29 @@ class MainWindow(QtWidgets.QMainWindow):
             if Input < interfacing.FreqRangeMax:
                 interfacing.FreqRangeMin = Input
             else:
-                self.MinRangeSlider.setValue(interfacing.FreqRangeMin)  # Prevents min from exceeding max
+                # Prevents min from exceeding max
+                self.MinRangeSlider.setValue(interfacing.FreqRangeMin)
         if MinOrMax == "max":
             if Input > interfacing.FreqRangeMin:
                 interfacing.FreqRangeMax = Input
             else:
-                self.MaxRangeSlider.setValue(interfacing.FreqRangeMax)  # Prevents max from going below min
+                # Prevents max from going below min
+                self.MaxRangeSlider.setValue(interfacing.FreqRangeMax)
 
         self.plotSpectro()
         interfacing.printDebug(MinOrMax + "SpectroSlider: " + str(Input))
+
+    def DynamicUpdate(self):
+        for Index in range(3):  # TODO: make this variable later
+            if interfacing.ChannelLineArr[Index].Filepath != "null":
+                if interfacing.ChannelLineArr[Index].IsHidden == True:
+                    self.LineReferenceArr[Index].hide()
+                else:
+                    self.LineReferenceArr[Index].show()
+
+                self.LineReferenceArr[Index].setData(
+                    self.xAxis[0], self.yAxis[Index], pen=interfacing.ChannelLineArr[Index].GetColour(), name=interfacing.ChannelLineArr[Index].Label, skipFiniteCheck=True)
+
 
 #------------------------------------------------------------------------------------------------------------------------------------------------------#
 

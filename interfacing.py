@@ -54,7 +54,7 @@ def SetSelectedIndex(Input, Selector):
         printDebug("Signal dropdown: " + str(SignalSelectedIndex))
 
 
-class ChannelLine:
+class ChannelLine():
 
     def __init__(self, Label="Unlabeled", LineColour=0xFFFF00,
                  IsHidden=False, Filepath="null", Time=[], Amplitude=[]):
@@ -205,6 +205,7 @@ def initConnectors(self):
     self.SpeedLCD = self.findChild(QLCDNumber, "SpeedLCD")
     self.SpeedSlider.valueChanged.connect(
         lambda: self.SpeedLCD.display(round((self.SpeedSlider.value()/100)*4)/4))
+
 
 def initSpectroRangeSliders(self):
     self.MinRangeSlider = self.findChild(QSlider, "MinRangeSlider")
