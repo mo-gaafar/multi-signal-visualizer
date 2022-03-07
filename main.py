@@ -45,6 +45,10 @@ class MainWindow(QtWidgets.QMainWindow):
         super(MainWindow, self).__init__(*args, **kwargs)
         uic.loadUi('mainwindow2.ui', self)
 
+        self.setWindowIcon(QtGui.QIcon('icon.png'))
+        # set the title
+        self.setWindowTitle("Multi-Channel Signal Viewer")
+
         # Initialization functions
         interfacing.initConnectors(self)
         #interfacing.initSpectroRangeSliders(self)
@@ -74,15 +78,15 @@ class MainWindow(QtWidgets.QMainWindow):
         filetype = path[len(path)-3:]  # gets last 3 letters of path
 
         if filetype == "hea" or filetype == "rec" or filetype == "dat":
-            self.record = wfdb.rdrecord(path[:-4], channels=[1])
-            #self.d_signal = self.record.adc()
-            #TempArrX = self.d_signal[:][1]
+            self.record = wfdb.rdrecord(path[:-4], channels=[0])
             TempArrY = self.record.p_signal
             TempArrY = np.concatenate(TempArrY)
+
             #print(self.record.fs)
             self.fsampling = self.record.fs
             interfacing.FreqRangeMax = self.fsampling/2
             #print(TempArrY)
+
             for Index in range(len(TempArrY)):
                 TempArrX.append(Index/self.record.fs)
 
@@ -146,7 +150,7 @@ class MainWindow(QtWidgets.QMainWindow):
     # def InitDataPoints(self):
 
     def update_plot_data(self):
-        #print("Timer ", self.timer.interval())
+
         self.timer.setInterval(self.PlotterWindowProp.CineSpeed)
 
         for ChannelIndex in range(len(interfacing.ChannelLineArr)):
@@ -160,12 +164,9 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.xAxis[ChannelIndex] = interfacing.ChannelLineArr[ChannelIndex].Time[:self.pointsToAppend]
                 self.yAxis[ChannelIndex] = interfacing.ChannelLineArr[ChannelIndex].Amplitude[:self.pointsToAppend]
 
-        # interfacing.printDebug(self.xAxis[0])
         self.pointsToAppend += 5
-        # if self.pointsToAppend > len(self.time):
-        #     self.timer.stop()
+
         # TODO: if the shortest signal ends stop the timer
-        #MinSignalLen = min(map(len, interfacing.ChannelLineArr.Time))
 
         # DEBUGGING LOOP
         for Index in range(3):
@@ -179,28 +180,22 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.pointsToAppend > self.MinSignalLen:
             self.timer.stop()
 
-        # if self.time[self.pointsToAppend] > 1:   #1 because this where our axis stops at at the begings to evry time we need to update the axis inorder for it to plot dynamiclly
-        # self.Plot.setLimits(xMax=max(self.x, default=0))
-
         # TODO: Set y limits based on all plottable signals
-        # TODO: Zoom and scrolling might require changes to limits
-
-        # TODO: to be embedded as in the class plotwindow
-        # VisibleYRange = (0,0)
-        # VisibleXRange = (0,0)
 
         # TODO: fix this
         self.Plot.plotItem.setXRange(
             max(self.xAxis[0], default=0)-1.0, max(self.xAxis[0], default=0))
-
+        #self.Plot.plotItem.legend.addItem("batee5", "brengan")
         # Plots all signals
         for Index in range(3):  # TODO: make this variable later
             if interfacing.ChannelLineArr[Index].Filepath != "null":
-                # TODO: signal should be time indexed
-                # self.PlotWidget.setData(
-                # self.xAxis[0], self.yAxis[Index], pen=interfacing.ChannelLineArr[Index].GetColour(), skipFiniteCheck=True)
+                if interfacing.ChannelLineArr[Index].IsHidden == True:
+                    self.LineReferenceArr[Index].hide()
+                else:
+                    self.LineReferenceArr[Index].show()
+
                 self.LineReferenceArr[Index].setData(
-                    self.xAxis[0], self.yAxis[Index], pen=interfacing.ChannelLineArr[Index].GetColour(), skipFiniteCheck=True)
+                    self.xAxis[0], self.yAxis[Index], pen=interfacing.ChannelLineArr[Index].GetColour(), name=interfacing.ChannelLineArr[Index].Label, skipFiniteCheck=True)
 
     def ExportPDF(self):
         # Folder Dialog (failed attempt)
@@ -233,6 +228,9 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             self.timer.start()
         interfacing.printDebug("PauseToggle")
+
+    def ToggleHide(self, Checked):
+        interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].IsHidden = Checked
 
     def horizontalScrollBarFunction(self, Input):
         self.ValueHorizontal = Input
@@ -291,6 +289,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.axes.set_ylabel('Frequency [Hz]', color = 'white')
             self.axes.set_xlabel('Time [s]', color = 'white')
             self.axes.set_yscale('symlog')
+
             self.Spectrogram.draw()
             self.figure.canvas.draw()
 
