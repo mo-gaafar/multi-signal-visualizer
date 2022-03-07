@@ -3,7 +3,7 @@ from tkinter import Label, dialog
 from tkinter.tix import DirSelectDialog
 from PyQt5 import QtWidgets, uic
 from PyQt5 import QtGui, QtCore, QtWidgets
-from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QTextEdit, QFileDialog, QScrollBar, QComboBox, QColorDialog, QCheckBox
+from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QTextEdit, QFileDialog, QScrollBar, QComboBox, QColorDialog, QCheckBox, QSlider
 from numpy.lib.index_tricks import IndexExpression
 
 from pyqtgraph import PlotWidget
@@ -51,6 +51,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Initialization functions
         interfacing.initConnectors(self)
+        #interfacing.initSpectroRangeSliders(self)
         interfacing.initArrays(self)
         self.CreateSpectrogramFigure()
 
@@ -80,9 +81,12 @@ class MainWindow(QtWidgets.QMainWindow):
             self.record = wfdb.rdrecord(path[:-4], channels=[0])
             TempArrY = self.record.p_signal
             TempArrY = np.concatenate(TempArrY)
-            print(self.record.fs)
+
+            #print(self.record.fs)
             self.fsampling = self.record.fs
-            print(TempArrY)
+            interfacing.FreqRangeMax = self.fsampling/2
+            #print(TempArrY)
+
             for Index in range(len(TempArrY)):
                 TempArrX.append(Index/self.record.fs)
 
@@ -99,6 +103,7 @@ class MainWindow(QtWidgets.QMainWindow):
         interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].Time = TempArrX
         interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].Filepath = path
 
+        interfacing.initSpectroRangeSliders(self)
         self.plotSpectro()
 
         self.plot_data()  # starts plot after file is accessed
@@ -145,7 +150,7 @@ class MainWindow(QtWidgets.QMainWindow):
     # def InitDataPoints(self):
 
     def update_plot_data(self):
-        # print("Timer ", self.timer.interval())
+
         self.timer.setInterval(self.PlotterWindowProp.CineSpeed)
 
         for ChannelIndex in range(len(interfacing.ChannelLineArr)):
@@ -254,10 +259,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def plotSpectro(self):
 
-        FS = 30
+        FS = 0
 
         # Corner Case Of Empty Channel
         if len(interfacing.ChannelLineArr[interfacing.SpectroSelectedIndex].Amplitude) == 0:
+            self.axes.clear()
             self.Spectrogram.draw()
             self.figure.canvas.draw()
 
@@ -267,16 +273,23 @@ class MainWindow(QtWidgets.QMainWindow):
 
             self.SignalArray = np.array(
                 interfacing.ChannelLineArr[interfacing.SpectroSelectedIndex].Amplitude)
-            self.freqs, self.times, self.Sx = signal.spectrogram(
-                self.SignalArray, fs=FS, window='hanning', nfft=256, noverlap=128, detrend=False, mode='magnitude', scaling='density')
+            self.freq, self.time, self.Sxx = signal.spectrogram(
+                self.SignalArray, fs=FS, window='hanning', nperseg=128, noverlap=64, detrend=False, mode='magnitude', scaling='density')
 
-            self.max_freq = np.max(self.freqs)
-            self.axes.set_ylim(
-                [interfacing.FreqRangeMin, interfacing.FreqRangeMax])
-            self.axes.pcolormesh(self.times, self.freqs,
-                                 self.Sx, cmap=interfacing.SpectroTheme)
-            self.axes.set_ylabel('Frequency [kHz]', color='white')
-            self.axes.set_xlabel('Time [s]', color='white')
+            self.max_freq = np.max(self.freq)
+            self.axes.set_ylim([0, self.max_freq])
+
+            # Slices freq arr into range specified by sliders
+            self.freqRange = np.where((self.freq >= interfacing.FreqRangeMin) & (self.freq <= interfacing.FreqRangeMax))
+            self.freq = self.freq[self.freqRange]
+            self.Sxx = self.Sxx[self.freqRange, :][0]
+
+            # Plots Spectrogram
+            self.axes.pcolormesh(self.time, self.freq, 10*np.log10(self.Sxx), cmap = interfacing.SpectroTheme)
+            self.axes.set_ylabel('Frequency [Hz]', color = 'white')
+            self.axes.set_xlabel('Time [s]', color = 'white')
+            self.axes.set_yscale('symlog')
+
             self.Spectrogram.draw()
             self.figure.canvas.draw()
 
@@ -287,13 +300,18 @@ class MainWindow(QtWidgets.QMainWindow):
     def SetSpectroTheme(self, Input):
         interfacing.SpectroTheme = Input
         self.plotSpectro()
-        print(interfacing.SpectroTheme)
 
     def SpectrogramFrequency(self, Input, MinOrMax):
         if MinOrMax == "min":
-            interfacing.FreqRangeMin = Input
+            if Input < interfacing.FreqRangeMax:
+                interfacing.FreqRangeMin = Input
+            else:
+                self.MinRangeSlider.setValue(interfacing.FreqRangeMin)  # Prevents min from exceeding max
         if MinOrMax == "max":
-            interfacing.FreqRangeMax = Input
+            if Input > interfacing.FreqRangeMin:
+                interfacing.FreqRangeMax = Input
+            else:
+                self.MaxRangeSlider.setValue(interfacing.FreqRangeMax)  # Prevents max from going below min
 
         self.plotSpectro()
         interfacing.printDebug(MinOrMax + "SpectroSlider: " + str(Input))

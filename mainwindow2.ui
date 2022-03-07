@@ -633,7 +633,7 @@ selection-background-color: rgb(19, 28, 38);</string>
                <item>
                 <widget class="QSlider" name="MinRangeSlider">
                  <property name="maximum">
-                  <number>14</number>
+                  <number>250</number>
                  </property>
                  <property name="tracking">
                   <bool>true</bool>
@@ -659,13 +659,13 @@ selection-background-color: rgb(19, 28, 38);</string>
                <item>
                 <widget class="QSlider" name="MaxRangeSlider">
                  <property name="minimum">
-                  <number>1</number>
+                  <number>2</number>
                  </property>
                  <property name="maximum">
-                  <number>15</number>
+                  <number>250</number>
                  </property>
                  <property name="sliderPosition">
-                  <number>15</number>
+                  <number>250</number>
                  </property>
                  <property name="tracking">
                   <bool>true</bool>
@@ -677,7 +677,7 @@ selection-background-color: rgb(19, 28, 38);</string>
                   <enum>QSlider::TicksBelow</enum>
                  </property>
                  <property name="tickInterval">
-                  <number>1</number>
+                  <number>0</number>
                  </property>
                 </widget>
                </item>
@@ -690,7 +690,7 @@ selection-background-color: rgb(19, 28, 38);</string>
                   <bool>false</bool>
                  </property>
                  <property name="intValue" stdset="0">
-                  <number>15</number>
+                  <number>250</number>
                  </property>
                 </widget>
                </item>
@@ -732,7 +732,7 @@ selection-background-color: rgb(19, 28, 38);</string>
              </item>
              <item>
               <property name="text">
-               <string>prism</string>
+               <string>jet</string>
               </property>
              </item>
              <item>
