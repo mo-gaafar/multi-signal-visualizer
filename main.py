@@ -495,6 +495,12 @@ class MainWindow(QtWidgets.QMainWindow):
                # TODO zabtahaaaaaaaa
                 QtWidgets.QMessageBox.information(
                     self, 'Done', 'PDF has been created')
+
+                # deletes temporary files
+                os.remove("test.csv")
+                os.remove("test.png")
+                os.remove("test.svg")
+                os.remove("Spectrogram.png")
 #------------------------------------------------------------------------------------------------------------------------------------------------------#
 
 
