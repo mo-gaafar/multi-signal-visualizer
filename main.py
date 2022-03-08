@@ -7,6 +7,7 @@ from PyQt5 import QtGui, QtCore, QtWidgets
 from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QTextEdit, QFileDialog, QScrollBar, QComboBox, QColorDialog, QCheckBox, QSlider
 from numpy.lib.index_tricks import IndexExpression
 
+import pandas as pd
 from pyqtgraph import PlotWidget
 import pyqtgraph as pg
 import sys
@@ -495,48 +496,109 @@ class MainWindow(QtWidgets.QMainWindow):
         interfacing.printDebug(MinOrMax + "SpectroSlider: " + str(Input))
 #--------------------------------------------------------------- Table FUNCTIONS ---------------------------------------------------------------------------------------------------#
 
-    def createTable(self):
-        self.tableWidget = QTableWidget()
+    # def createTable(self):
+    #     self.tableWidget = QTableWidget()
 
-        # Row count
-        self.tableWidget.setRowCount(4)
+    #     # Row count
+    #     self.tableWidget.setRowCount(4)
 
-        # Column count
-        self.tableWidget.setColumnCount(2)
+    #     # Column count
+    #     self.tableWidget.setColumnCount(2)
 
-        self.tableWidget.setItem(0, 0, QTableWidgetItem(min))
-        self.tableWidget.setItem(0, 1, QTableWidgetItem(max))
-        self.tableWidget.setItem(1, 0, QTableWidgetItem("Aloysius"))
-        self.tableWidget.setItem(1, 1, QTableWidgetItem("Indore"))
-        self.tableWidget.setItem(2, 0, QTableWidgetItem("Alan"))
-        self.tableWidget.setItem(2, 1, QTableWidgetItem("Bhopal"))
-        self.tableWidget.setItem(3, 0, QTableWidgetItem("Arnavi"))
-        self.tableWidget.setItem(3, 1, QTableWidgetItem("Mandsaur"))
+    #     self.tableWidget.setItem(0, 0, QTableWidgetItem(min))
+    #     self.tableWidget.setItem(0, 1, QTableWidgetItem(max))
+    #     self.tableWidget.setItem(1, 0, QTableWidgetItem("Aloysius"))
+    #     self.tableWidget.setItem(1, 1, QTableWidgetItem("Indore"))
+    #     self.tableWidget.setItem(2, 0, QTableWidgetItem("Alan"))
+    #     self.tableWidget.setItem(2, 1, QTableWidgetItem("Bhopal"))
+    #     self.tableWidget.setItem(3, 0, QTableWidgetItem("Arnavi"))
+    #     self.tableWidget.setItem(3, 1, QTableWidgetItem("Mandsaur"))
 
 #--------------------------------------------------------------- EXPORT FUNCTIONS --------------------------------------------------------------------------------------------------#
 
+#     def ExportPDF(self):
+
+#         # TODO make the messages valid
+#         if self.pointsToAppend == 0:
+#             QtWidgets.QMessageBox.warning(  self, 'NO SIGNAL ', 'You have to plot a signal first')
+#         elif self.pointsToAppend != 0:
+#             QtWidgets.QMessageBox.information(  self, 'Done', 'PDF has been created')
+#        # create a CSV file of the signal
+#             ex1 = pg.exporters.CSVExporter(self.Plot.plotItem)
+#             ex1.export('test.csv')
+#        # create a excell sheet of the signal
+#             ex2 = pg.exporters.SVGExporter(self.Plot.plotItem)
+#             ex2.export('test.svg')
+#        # create a picture of the signal
+#             ex3 = pg.exporters.ImageExporter(self.Plot.plotItem)
+#             ex3.export('test.png')
+#        # put the picture of the signal in an array
+#         self.list = ['test.png']
+#         # call the function create_pdf()
+
+#         self.create_pdf()
+
+# #--------------------------------------------------------------------------------CREATE TABLE------------------------------------------------------------#
+
+    # def createTable(self):
+    #     self.tableWidget = QTableWidget()
+
+    #     # Row count
+    #     self.tableWidget.setRowCount(4)
+
+    #     # Column count
+    #     self.tableWidget.setColumnCount(2)
+
+    #     self.tableWidget.setItem(0, 0, QTableWidgetItem("Name"))
+    #     self.tableWidget.setItem(0, 1, QTableWidgetItem("City"))
+    #     self.tableWidget.setItem(1, 0, QTableWidgetItem("Aloysius"))
+    #     self.tableWidget.setItem(1, 1, QTableWidgetItem("Indore"))
+    #     self.tableWidget.setItem(2, 0, QTableWidgetItem("Alan"))5
+    #     self.tableWidget.setItem(2, 1, QTableWidgetItem("Bhopal"))
+    #     self.tableWidget.setItem(3, 0, QTableWidgetItem("Arnavi"))
+    #     self.tableWidget.setItem(3, 1, QTableWidgetItem("Mandsaur"))
+
+       # self.create_pdf()
+  #--------------------------------------------------------RXPORT FUNCTION---------------------------------------------------------------------------#
+
     def ExportPDF(self):
-
-        # TODO make the messages valid
+        # the function that creates the pdf report
         if self.pointsToAppend == 0:
-            QtWidgets.QMessageBox.warning(
-                self, 'NO SIGNAL ', 'You have to plot a signal first')
-        elif self.pointsToAppend != 0:
-            QtWidgets.QMessageBox.information(
-                self, 'Done', 'PDF has been created')
-       # create a CSV file of the signal
-            ex1 = pg.exporters.CSVExporter(self.Plot.plotItem)
-            ex1.export('test.csv')
-       # create a excell sheet of the signal
-            ex2 = pg.exporters.SVGExporter(self.Plot.plotItem)
-            ex2.export('test.svg')
-       # create a picture of the signal
-            ex3 = pg.exporters.ImageExporter(self.Plot.plotItem)
-            ex3.export('test.png')
-       # put the picture of the signal in an array
-        self.list = ['test.png']
-        # call the function create_pdf()
+            QtWidgets.QMessageBox.warning(  self, 'NO SIGNAL ', 'You have to plot a signal first')
+        else:
+            pdname = QFileDialog.getSaveFileName( None, str('Save the signal file'), None, str("PDF FIles(*.pdf)"))
+            if pdname != '':
+                pdf = FPDF()
+                # set pdf title
+                pdf.add_page()
+                pdf.set_font('Arial', 'B', 17)
+                pdf.cell(70)
+                pdf.cell(50, 10, 'Signal Viewer Report', 0, 0, 'C')
+                pdf.ln(5)
+            # pdf.cell(60, 10, 'Abdullah', 0, 0, 'L')
+               
+              
 
+                pdf.ln(20)
+            # create a CSV file of the signal
+                ex1 = pg.exporters.CSVExporter(self.Plot.plotItem)
+                ex1.export('test.csv')
+              
+                # df = pd.read_csv('test.csv')
+                # self.E= df.describe()
+                # print(self.E)    
+                # pdf.cell(50, 10, self.E, 0, 0, 'C')
+        
+        # create a excell sheet of the signal
+              
+                ex2 = pg.exporters.SVGExporter(self.Plot.plotItem)
+                ex2.export('test.svg')
+        # create a picture of the signal
+                ex3 = pg.exporters.ImageExporter(self.Plot.plotItem)
+                ex3.export('test.png')
+        # put the picture of the signal in an array
+                self.list = ['test.png']
+        # call the function create_pdf()
         self.create_pdf()
 
 #--------------------------------------------------------------------------------CREATE TABLE------------------------------------------------------------#
@@ -591,11 +653,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # path = self.filename
 
-        # removes the graphs pictures as we dont need
-        os.remove("test.png")
-        os.remove("test.csv")
-        os.remove("test.svg")
-        os.remove('Spectrogram.png')
+                # removes the graphs pictures as we dont need
+                # os.remove("test.png")
+                # os.remove("test.csv")
+                # os.remove("test.svg")
+                # os.remove('Spectrogram.png')
 
 
 #------------------------------------------------------------------------------------------------------------------------------------------------------#
