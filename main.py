@@ -146,24 +146,30 @@ class MainWindow(QtWidgets.QMainWindow):
         self.pointsToAppend = 0
 
         # TODO: Set limits based on all plottable signals
-
+        # use object oriented next time....
         MaxX = 0
         MaxY = 0
+        MinX = 0
+        MinY = 0
 
-        for Index in range(3):
+        for Index in range(3):  # TODO: make range variable later
             if len(interfacing.ChannelLineArr[Index].Time) != 0 and len(interfacing.ChannelLineArr[Index].Time) > MaxX:
                 MaxX = len(interfacing.ChannelLineArr[Index].Time)
 
-            if len(interfacing.ChannelLineArr[Index].Amplitude) != 0 and len(interfacing.ChannelLineArr[Index].Time) > MaxY:
-                MaxY = len(interfacing.ChannelLineArr[Index].Amplitude)
+            if len(interfacing.ChannelLineArr[Index].Amplitude) != 0 and max(interfacing.ChannelLineArr[Index].Amplitude) > MaxY:
+                MaxY = max(interfacing.ChannelLineArr[Index].Amplitude)
 
-        #interfacing.printDebug("MaxY = " + str(MaxY))
-        # self.Plot.plotItem.setLimits(xMin=min(self.time), xMax=max(self.time), yMin=min(
-        #     self.amplitude), yMax=max(self.amplitude))  # limit bata3 al axis ali 3andi
-        MinY = -1  # Placeholder
+            if len(interfacing.ChannelLineArr[Index].Time) != 0 and len(interfacing.ChannelLineArr[Index].Time) < MinX:
+                MinX = len(interfacing.ChannelLineArr[Index].Time)
+
+            if len(interfacing.ChannelLineArr[Index].Amplitude) != 0 and min(interfacing.ChannelLineArr[Index].Amplitude) < MinY:
+                MinY = min(interfacing.ChannelLineArr[Index].Amplitude)
+
+        # MinY = -1  # Placeholder
         interfacing.printDebug("MaxX: " + str(MaxX))
-        # limit bata3 al axis ali 3andi
-        self.Plot.plotItem.setLimits(xMin=0, xMax=MaxX, yMin=MinY, yMax=MaxY)
+
+        self.Plot.plotItem.setLimits(
+            xMin=MinX, xMax=MaxX, yMin=MinY, yMax=MaxY)
         self.pointsToAppend = 0  # Plotted Points counter
 
         # Initialize Qt Timer
@@ -185,29 +191,16 @@ class MainWindow(QtWidgets.QMainWindow):
 
                 # Index of channels containing files
                 # self.FilledChannels.append(ChannelIndex)
-
                 self.xAxis[ChannelIndex] = interfacing.ChannelLineArr[ChannelIndex].Time[:self.pointsToAppend]
                 self.yAxis[ChannelIndex] = interfacing.ChannelLineArr[ChannelIndex].Amplitude[:self.pointsToAppend]
 
         self.pointsToAppend += 5
-
-        # TODO: if the shortest signal ends stop the timer
-
-        # DEBUGGING LOOP
-        # for Index in range(3):
-        #     if interfacing.ChannelLineArr[Index].Filepath != "null":
-        #         interfacing.printDebug("Channel number: " + str(Index))
-        #         interfacing.printDebug(
-        #             len(interfacing.ChannelLineArr[Index].Time))
-        #         interfacing.printDebug(len(self.xAxis[Index]))
 
         self.horizontalScrollBarFunction()
         self.verticalScrollBarFunction()
         #interfacing.printDebug("Minimum signal length: " + str(MinSignalLen))
         if self.pointsToAppend > self.MinSignalLen:
             self.timer.stop()
-
-        # TODO: Set y limits based on all plottable signals
 
         # Plots all signals
         for Index in range(3):  # TODO: make this variable later.;
@@ -217,6 +210,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 # self.xAxis[0], self.yAxis[Index], pen=interfacing.ChannelLineArr[Index].GetColour(), skipFiniteCheck=True)
                 self.LineReferenceArr[Index].setData(
                     self.xAxis[0], self.yAxis[Index], pen=interfacing.ChannelLineArr[Index].GetColour(), skipFiniteCheck=True)
+
 
 #-----------------------------------------------------------------------------------------------------------------------------------------------#
     # def ExportPDF(self):
@@ -289,6 +283,7 @@ class MainWindow(QtWidgets.QMainWindow):
 #-----------------------------------------------------------------------------------------------------------------------------------------------#
     # OPENS COLOUR DIALOG WHEN BUTTON IS PRESSED
 
+
     def DynamicUpdate(self):
         for Index in range(3):  # TODO: make this variable later
             if interfacing.ChannelLineArr[Index].Filepath != "null":
@@ -329,7 +324,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.ValueHorizontal = self.horizontalScrollBar.value()
 
-        if self.HoldVarH == True:  # law al value bata3 al scroll at8yar dah ma3nah ano 3aiz maymshesh ma3a al line
+        if self.HoldVarH == True:
             self.Plot.plotItem.setXRange(
                 interfacing.ChannelLineArr[0].Time[self.ValueHorizontal]-1.0, interfacing.ChannelLineArr[0].Time[self.ValueHorizontal])
         else:
@@ -405,7 +400,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
 
 #------------------------------------------------------SPECTROGRAM FUNCTIONS------------------------------------------------------------------------------------#
-
 
     def CreateSpectrogramFigure(self):
         self.figure = plt.figure()                     # Create matplotlib fig
