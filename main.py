@@ -220,7 +220,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Plots all signals
         for Index in range(3):  # TODO: make this variable later.;
-            if interfacing.ChannelLineArr[Index].Filepath != "null":
+            if interfacing.ChannelLineArr[Index].Filepath != "null" and len(interfacing.ChannelLineArr[Index].Time) > self.pointsToAppend:
                 # TODO: signal should be time indexed
                 # self.PlotWidget.setData(
                 # self.xAxis[0], self.yAxis[Index], pen=interfacing.ChannelLineArr[Index].GetColour(), skipFiniteCheck=True)
@@ -234,7 +234,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def DynamicUpdate(self):
         for Index in range(3):  # TODO: make this variable later
-            if interfacing.ChannelLineArr[Index].Filepath != "null":
+            if interfacing.ChannelLineArr[Index].Filepath != "null" and len(interfacing.ChannelLineArr[Index].Time) > self.pointsToAppend:
                 if interfacing.ChannelLineArr[Index].IsHidden == True:
                     self.LineReferenceArr[Index].hide()
                 else:
@@ -274,27 +274,6 @@ class MainWindow(QtWidgets.QMainWindow):
         interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].IsHidden = Checked
         self.DynamicUpdate()
 
-    def horizontalScrollBarFunction(self):
-
-        self.ValueHorizontal = self.horizontalScrollBar.value()
-
-        if self.HoldVarH == True:
-            self.Plot.plotItem.setXRange(
-                interfacing.ChannelLineArr[0].Time[self.ValueHorizontal]-1.0, interfacing.ChannelLineArr[0].Time[self.ValueHorizontal])
-        else:
-            self.Plot.plotItem.setXRange(
-                max(self.xAxis[0], default=0)-1.0, max(self.xAxis[0], default=0))
-            self.ValueHorizontal = self.horizontalScrollBar.setValue(
-                max(self.xAxis[0], default=0)*2000)
-
-        self.horizontalScrollBar.setMinimum(0)
-        self.horizontalScrollBar.setMaximum(
-            len(interfacing.ChannelLineArr[0].Time))
-        self.horizontalScrollBar.setSingleStep(20)
-
-        interfacing.printDebug("Horizontal Scroll: " +
-                               str(self.ValueHorizontal))
-
     def IsHeldH(self):
         self.HoldVarH = True  # mamsoka
 
@@ -306,6 +285,26 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def NotHeldV(self):
         self.HoldVarV = False  # etsabet
+
+    def horizontalScrollBarFunction(self):
+
+        self.ValueHorizontal = self.horizontalScrollBar.value()
+
+        if self.HoldVarH == True and self.ValueHorizontal <= self.pointsToAppend:
+            self.Plot.plotItem.setXRange(
+                interfacing.ChannelLineArr[0].Time[self.ValueHorizontal]-1.0, interfacing.ChannelLineArr[0].Time[self.ValueHorizontal])
+        else:
+            self.Plot.plotItem.setXRange(
+                max(self.xAxis[0], default=0)-1.0, max(self.xAxis[0], default=0))
+            # self.ValueHorizontal = self.horizontalScrollBar.setValue(max(self.xAxis[0], default=0)*2000)
+
+        self.horizontalScrollBar.setMinimum(0)
+        self.horizontalScrollBar.setMaximum(
+            len(interfacing.ChannelLineArr[0].Time))
+        self.horizontalScrollBar.setSingleStep(20)
+
+        interfacing.printDebug("Horizontal Scroll: " +
+                               str(self.ValueHorizontal))
 
     def verticalScrollBarFunction(self):
         self.ValueVertical = self.verticalScrollBar.value()
@@ -320,7 +319,8 @@ class MainWindow(QtWidgets.QMainWindow):
         MaxY = self.MaxY
         MinY = self.MinY
         MyRange = (MaxY-MinY)/5
-        if self.HoldVarV == True:  # law al value bata3 al scroll at8yar dah ma3nah ano 3aiz maymshesh ma3a al line
+        # law al value bata3 al scroll at8yar dah ma3nah ano 3aiz maymshesh ma3a al line
+        if self.HoldVarV == True:
             # len(interfacing.ChannelLineArr[0].Amplitude) will be replaced with number of points on the plot
             if self.ValueVertical >= 0 and self.ValueVertical <= len(interfacing.ChannelLineArr[0].Amplitude)*(1/5):
                 # in order to get the max number of values
