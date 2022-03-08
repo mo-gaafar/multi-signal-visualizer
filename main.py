@@ -141,9 +141,6 @@ class MainWindow(QtWidgets.QMainWindow):
             interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].Amplitude = TempArrY
             interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].Time = TempArrX
 
-        interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].Amplitude = TempArrY
-        interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].Time = TempArrX
-        interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].Filepath = path
         self.Legend = self.Plot.addLegend()
         interfacing.initSpectroRangeSliders(self)
 
@@ -154,9 +151,9 @@ class MainWindow(QtWidgets.QMainWindow):
     def plot_data(self):
 
         pen = pg.mkPen(color=(255, 255, 255))
-        self.PlotWidget[interfacing.SignalSelectedIndex] = self.Plot.plot(pen=interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].GetColour(), name = "Channel " + str(interfacing.SignalSelectedIndex + 1))
+        self.PlotWidget[interfacing.SignalSelectedIndex] = self.Plot.plot(
+            pen=interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].GetColour(), name="Channel " + str(interfacing.SignalSelectedIndex + 1))
         self.Plot.showGrid(x=True, y=True)
-        
 
         self.MinSignalLen = len(interfacing.ChannelLineArr[0].Amplitude)
         interfacing.printDebug(
@@ -232,12 +229,11 @@ class MainWindow(QtWidgets.QMainWindow):
                 # self.PlotWidget.setData(
                 # self.xAxis[0], self.yAxis[Index], pen=interfacing.ChannelLineArr[Index].GetColour(), skipFiniteCheck=True)
                 self.LineReferenceArr[Index].setData(
-                    self.xAxis[0], self.yAxis[Index], pen=interfacing.ChannelLineArr[Index].GetColour(), name = "name")
+                    self.xAxis[0], self.yAxis[Index], pen=interfacing.ChannelLineArr[Index].GetColour(), name="name")
 
 
 #-----------------------------------------------------------------------------------------------------------------------------------------------#
     # OPENS COLOUR DIALOG WHEN BUTTON IS PRESSED
-
 
     def DynamicUpdate(self):
         for Index in range(3):  # TODO: make this variable later
@@ -358,11 +354,13 @@ class MainWindow(QtWidgets.QMainWindow):
         interfacing.printDebug("Speed Slider: " + str(self.ValueCineSpeed))
         self.PlotterWindowProp.UpdateCineSpeed(Input)
         return self.ValueCineSpeed
-    
+
     def EditLabelFunction(self, Input):
         interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].Label = Input
-        print(interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].Label)
-        self.Legend.getLabel(self.PlotWidget[interfacing.SignalSelectedIndex]).setText(Input)
+        print(
+            interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].Label)
+        self.Legend.getLabel(
+            self.PlotWidget[interfacing.SignalSelectedIndex]).setText(Input)
 
 #------------------------------------------------------SPECTROGRAM FUNCTIONS------------------------------------------------------------------------------------#
 
@@ -453,6 +451,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 pdf.add_page()
                 pdf.set_font('Arial', 'B', 17)
                 pdf.cell(70)
+
                 pdf.cell(50, 10, 'Signal Viewer Report', 0, 0, 'C')
                 pdf.ln(5)
             # pdf.cell(60, 10, 'Abdullah', 0, 0, 'L')
@@ -462,9 +461,12 @@ class MainWindow(QtWidgets.QMainWindow):
                 ex1 = pg.exporters.CSVExporter(self.Plot.plotItem)
                 ex1.export('test.csv')
 
-                # df = pd.read_csv('test.csv')
-                # self.E= df.describe()
-                # print(self.E)
+                df = pd.read_csv('test.csv')
+                self.r = df.describe().loc[['mean', 'min']]
+                self.p = df.describe().loc[['max', 'std']]
+
+                self.E = df.describe()
+            #   print(self.E)
                 # pdf.cell(50, 10, self.E, 0, 0, 'C')
 
         # create a excell sheet of the signal
@@ -480,21 +482,19 @@ class MainWindow(QtWidgets.QMainWindow):
                 # put the graphs on the pdf
                 pdf.image('Desgin/CUFE.png', 1, 1, 50, 40)
                 pdf.image('Desgin/logo.png', 160, 1, 50, 40)
-                pdf.image('test.png', 50, 50, 150, 100)
-                pdf.image('Spectrogram.png', 50, 160, 120, 100)
+                pdf.image('test.png', 40, 50, 150, 100)
+                pdf.image('Spectrogram.png', 40, 160, 120, 100)
+                #pdf.cell(30,10, df.describe().loc[['mean']],0,0,'c')
+                pdf.text(130, 270, 'Duration')
+                pdf.text(160, 270, str(max(self.xAxis[0])))
+                pdf.text(-52, 270, self.r.to_string())
+                pdf.ln(10)
+                pdf.text(-50, 290, self.p.to_string())
+
                 pdf.output(str(pdname[0]))
+               # TODO zabtahaaaaaaaa
                 QtWidgets.QMessageBox.information(
                     self, 'Done', 'PDF has been created')
-                # pdf.image()
-
-        # path = self.filename
-
-                # removes the graphs pictures as we dont need
-                # os.remove("test.png")
-                # os.remove("test.csv")
-                # os.remove("test.svg")
-                # os.remove('Spectrogram.png')
-
 #------------------------------------------------------------------------------------------------------------------------------------------------------#
 
 
