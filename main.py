@@ -77,6 +77,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.HoldVarV = False
         self.xAxis = [0, 0, 0]
         self.yAxis = [0, 0, 0]
+        self.PlotWidget = []
+        for Index in range(3):
+            self.PlotWidget.append(PlotWidget())
 
         self.LineReferenceArr = [self.Plot.plot(self.xAxis, self.yAxis), self.Plot.plot(
             self.xAxis, self.yAxis), self.Plot.plot(self.xAxis, self.yAxis)]
@@ -138,6 +141,10 @@ class MainWindow(QtWidgets.QMainWindow):
             interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].Amplitude = TempArrY
             interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].Time = TempArrX
 
+        interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].Amplitude = TempArrY
+        interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].Time = TempArrX
+        interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].Filepath = path
+        self.Legend = self.Plot.addLegend()
         interfacing.initSpectroRangeSliders(self)
 
         self.plotSpectro()
@@ -147,9 +154,9 @@ class MainWindow(QtWidgets.QMainWindow):
     def plot_data(self):
 
         pen = pg.mkPen(color=(255, 255, 255))
-        self.PlotWidget = self.Plot.plot(pen=pen)
+        self.PlotWidget[interfacing.SignalSelectedIndex] = self.Plot.plot(pen=interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].GetColour(), name = "Channel " + str(interfacing.SignalSelectedIndex + 1))
         self.Plot.showGrid(x=True, y=True)
-        self.Plot.addLegend()
+        
 
         self.MinSignalLen = len(interfacing.ChannelLineArr[0].Amplitude)
         interfacing.printDebug(
@@ -225,7 +232,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 # self.PlotWidget.setData(
                 # self.xAxis[0], self.yAxis[Index], pen=interfacing.ChannelLineArr[Index].GetColour(), skipFiniteCheck=True)
                 self.LineReferenceArr[Index].setData(
-                    self.xAxis[0], self.yAxis[Index], pen=interfacing.ChannelLineArr[Index].GetColour(), skipFiniteCheck=True)
+                    self.xAxis[0], self.yAxis[Index], pen=interfacing.ChannelLineArr[Index].GetColour(), name = "name")
 
 
 #-----------------------------------------------------------------------------------------------------------------------------------------------#
@@ -351,7 +358,11 @@ class MainWindow(QtWidgets.QMainWindow):
         interfacing.printDebug("Speed Slider: " + str(self.ValueCineSpeed))
         self.PlotterWindowProp.UpdateCineSpeed(Input)
         return self.ValueCineSpeed
-
+    
+    def EditLabelFunction(self, Input):
+        interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].Label = Input
+        print(interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].Label)
+        self.Legend.getLabel(self.PlotWidget[interfacing.SignalSelectedIndex]).setText(Input)
 
 #------------------------------------------------------SPECTROGRAM FUNCTIONS------------------------------------------------------------------------------------#
 
@@ -364,7 +375,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def plotSpectro(self):
 
-        FS = 0
+        FS = 250
 
         # Corner Case Of Empty Channel
         if len(interfacing.ChannelLineArr[interfacing.SpectroSelectedIndex].Amplitude) == 0:

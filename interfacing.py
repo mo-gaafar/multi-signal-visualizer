@@ -7,7 +7,7 @@ from main import DebugMode, MainWindow
 import string
 from PyQt5 import QtWidgets, uic
 from PyQt5 import QtGui, QtCore, QtWidgets
-from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QSlider, QTextEdit, QFileDialog, QScrollBar, QComboBox, QCheckBox, QScrollBar, QLCDNumber
+from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QSlider, QTextEdit, QFileDialog, QScrollBar, QComboBox, QCheckBox, QScrollBar, QLCDNumber, QLineEdit
 # from pyparsing import null_debug_action
 
 import csv
@@ -30,7 +30,7 @@ ChannelLineArr = []
 # Global Interface Variables
 LabelTextBox = "null"
 FreqRangeMin = 0
-FreqRangeMax = 200
+FreqRangeMax = 250
 
 
 # TODO: add themes here somehow? create theme object or dictionary?
@@ -51,6 +51,7 @@ def SetSelectedIndex(Input, Selector):
     if Selector == "Signal":
         global SignalSelectedIndex
         SignalSelectedIndex = Input
+        print(SignalSelectedIndex)
         printDebug("Signal dropdown: " + str(SignalSelectedIndex))
 
 
@@ -220,6 +221,11 @@ def initConnectors(self):
     self.SpeedSlider.valueChanged.connect(
         lambda: self.SpeedLCD.display(round((self.SpeedSlider.value()/100)*4)/4))
 
+    self.EditLabel = self.findChild(QLineEdit, "EditLabelLine")
+    self.EditLabel.returnPressed.connect(
+        lambda: self.EditLabelFunction(self.EditLabel.text()))
+    self.EditLabel.returnPressed.connect(
+        lambda: self.EditLabel.clear())
 
 def initSpectroRangeSliders(self):
     self.MinRangeSlider = self.findChild(QSlider, "MinRangeSlider")
