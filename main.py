@@ -538,7 +538,6 @@ class MainWindow(QtWidgets.QMainWindow):
             QtWidgets.QMessageBox.warning(  self, 'NO SIGNAL ', 'You have to plot a signal first')
         else:
             pdname = QFileDialog.getSaveFileName( None, str('Save the signal file'), None, str("PDF FIles(*.pdf)"))
-            # print(self.pdname[0])
             if pdname != '':
                 pdf = FPDF()
                 # set pdf title
@@ -552,14 +551,14 @@ class MainWindow(QtWidgets.QMainWindow):
               
 
                 pdf.ln(20)
-        # create a CSV file of the signal
+            # create a CSV file of the signal
                 ex1 = pg.exporters.CSVExporter(self.Plot.plotItem)
                 ex1.export('test.csv')
               
-            #   df = pd.read_csv('test.csv')
-            #   self.E= df.describe()
-            #   print(self.E)    
-            #   pdf.cell(50, 10, self.E, 0, 0, 'C')
+                # df = pd.read_csv('test.csv')
+                # self.E= df.describe()
+                # print(self.E)    
+                # pdf.cell(50, 10, self.E, 0, 0, 'C')
         
         # create a excell sheet of the signal
               
@@ -577,6 +576,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 pdf.image('test.png', 50, 50, 150, 100)
                 pdf.image('Spectrogram.png', 50, 160, 120, 100)
                 pdf.output(str(pdname[0]))
+               #TODO zabtahaaaaaaaa
                 QtWidgets.QMessageBox.information( self, 'Done', 'PDF has been created')
                 # pdf.image()
 
