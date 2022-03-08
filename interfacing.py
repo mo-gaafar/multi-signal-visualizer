@@ -224,7 +224,8 @@ def initConnectors(self):
     self.EditLabel = self.findChild(QLineEdit, "EditLabelLine")
     self.EditLabel.returnPressed.connect(
         lambda: self.EditLabelFunction(self.EditLabel.text()))
-
+    self.EditLabel.returnPressed.connect(
+        lambda: self.EditLabel.clear())
 
 def initSpectroRangeSliders(self):
     self.MinRangeSlider = self.findChild(QSlider, "MinRangeSlider")
