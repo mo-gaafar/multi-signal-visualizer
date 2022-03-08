@@ -361,26 +361,40 @@ class MainWindow(QtWidgets.QMainWindow):
     def verticalScrollBarFunction(self):
         self.ValueVertical = self.verticalScrollBar.value()
 
-        if self.HoldVarV == True:  # law al value bata3 al scroll at8yar dah ma3nah ano 3aiz maymshesh ma3a al line
-            # tala3 fo2
-            if self.ValueVertical < (len(interfacing.ChannelLineArr[0].Amplitude)/2.0):
-
-                self.Plot.plotItem.setYRange(min(interfacing.ChannelLineArr[0].Amplitude[:self.ValueVertical], default=0)+0.1, max(
-                    interfacing.ChannelLineArr[0].Amplitude[:self.ValueVertical], default=0))  # TAKECARE:hasabat al range hena (n)
-            else:  # nazal ta7t
-                self.Plot.plotItem.setYRange(min(interfacing.ChannelLineArr[0].Amplitude[:self.ValueVertical], default=0), max(
-                    interfacing.ChannelLineArr[0].Amplitude[:self.ValueVertical], default=0)-0.1)
-
-        else:
-            self.Plot.plotItem.setYRange(min(self.yAxis[0], default=0), max(
-                self.yAxis[0], default=0))  # TAKECARE:hasabat al range hena
-            self.ValueVertical = self.verticalScrollBar.setValue(
-                len(interfacing.ChannelLineArr[0].Amplitude)/2.0)  # at amplitude=0
-
         self.verticalScrollBar.setMinimum(0)
         self.verticalScrollBar.setMaximum(
             len(interfacing.ChannelLineArr[0].Amplitude))
         self.verticalScrollBar.setSingleStep(20)
+        # TODO: after Setting limits based on all plottable signals
+        # we will have the max and min of y axis
+        # by subtracting them we get the length of y axis
+        MaxY = max(interfacing.ChannelLineArr[0].Amplitude)
+        MinY = min(interfacing.ChannelLineArr[0].Amplitude)
+        MyRange = (MaxY-MinY)/5
+        if self.HoldVarV == True:  # law al value bata3 al scroll at8yar dah ma3nah ano 3aiz maymshesh ma3a al line
+            # len(interfacing.ChannelLineArr[0].Amplitude) will be replaced with number of points on the plot
+            if self.ValueVertical >= 0 and self.ValueVertical <= len(interfacing.ChannelLineArr[0].Amplitude)*(1/5):
+                # in order to get the max number of values
+                # TAKECARE:hasabat al range hena (n)
+                self.Plot.plotItem.setYRange(MaxY-MyRange, MaxY)
+            elif self.ValueVertical >= len(interfacing.ChannelLineArr[0].Amplitude)*(1/5) and self.ValueVertical <= len(interfacing.ChannelLineArr[0].Amplitude)*(2/5):
+
+                self.Plot.plotItem.setYRange(MaxY-MyRange*2, MaxY-MyRange)
+
+            elif self.ValueVertical >= len(interfacing.ChannelLineArr[0].Amplitude)*(2/5) and self.ValueVertical <= len(interfacing.ChannelLineArr[0].Amplitude)*(3/5):
+                self.Plot.plotItem.setYRange(MaxY-MyRange*3, MaxY-MyRange*2)
+
+            elif self.ValueVertical >= len(interfacing.ChannelLineArr[0].Amplitude)*(3/5) and self.ValueVertical <= len(interfacing.ChannelLineArr[0].Amplitude)*(4/5):
+                self.Plot.plotItem.setYRange(MaxY-MyRange*4, MaxY-MyRange*3)
+            else:
+                self.Plot.plotItem.setYRange(MinY, MaxY-MyRange*4)
+
+        else:
+            self.Plot.plotItem.setYRange(min(self.yAxis[0], default=0), max(
+                self.yAxis[0], default=0))  # we might need to make the range const
+            self.ValueVertical = self.verticalScrollBar.setValue(
+                0)  # at amplitude=0
+
         interfacing.printDebug("Vertical Scroll: " + str(self.ValueVertical))
 
     def SpeedSliderFunction(self, Input):
