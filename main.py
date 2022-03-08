@@ -124,11 +124,21 @@ class MainWindow(QtWidgets.QMainWindow):
                     TempArrX.append(
                         float(line[0]))
 
-        interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].Amplitude = TempArrY
-        interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].Time = TempArrX
         interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].Filepath = path
 
+        # CHECKS IF CHANNEL 1 ISNT PLOTTED
+        if interfacing.ChannelLineArr[0].Filepath == "null":
+            QtWidgets.QMessageBox.warning(
+                self, 'CHANNEL 1 EMPTY ', 'PLEASE PLOT CHANNEL 1 FIRST')
+            interfacing.ChannelLineArr[0].Amplitude = TempArrY
+            interfacing.ChannelLineArr[0].Time = TempArrX
+
+        else:
+            interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].Amplitude = TempArrY
+            interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].Time = TempArrX
+
         interfacing.initSpectroRangeSliders(self)
+
         self.plotSpectro()
 
         self.plot_data()  # starts plot after file is accessed
@@ -172,6 +182,9 @@ class MainWindow(QtWidgets.QMainWindow):
             xMin=MinX, xMax=MaxX, yMin=MinY, yMax=MaxY)
         self.pointsToAppend = 0  # Plotted Points counter
 
+        self.MinY = MinY
+        self.MaxY = MaxY
+
         # Initialize Qt Timer
         self.timer = QtCore.QTimer()
         self.timer.setInterval(50)  # Overflow timer
@@ -201,6 +214,8 @@ class MainWindow(QtWidgets.QMainWindow):
         #interfacing.printDebug("Minimum signal length: " + str(MinSignalLen))
         if self.pointsToAppend > self.MinSignalLen:
             self.timer.stop()
+            QtWidgets.QMessageBox.warning(
+                self, 'NO SIGNAL ', 'The signal duration has ended')
 
         # Plots all signals
         for Index in range(3):  # TODO: make this variable later.;
@@ -300,10 +315,15 @@ class MainWindow(QtWidgets.QMainWindow):
         return self.SignalColour
 
     def ZoomInFunction(self):
+        self.timer.stop()  # Stopping the signal in order to view a specific point
+        # setting the toggle to true in order to press play to continue plotting
+        self.PauseToggleVar = True
         self.Plot.plotItem.getViewBox().scaleBy((0.5, 0.5))
         interfacing.printDebug("Zoomin")
 
     def ZoomOutFunction(self):
+        self.timer.stop()
+        self.PauseToggleVar = True
         self.Plot.plotItem.getViewBox().scaleBy((1.5, 1.5))
         interfacing.printDebug("Zoomout")
 
@@ -311,6 +331,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.PauseToggleVar = not self.PauseToggleVar  # On click, toggle state
         if self.PauseToggleVar == True:
             self.timer.stop()
+
         else:
             self.timer.start()
         interfacing.printDebug("PauseToggle")
@@ -363,8 +384,8 @@ class MainWindow(QtWidgets.QMainWindow):
         # TODO: after Setting limits based on all plottable signals
         # we will have the max and min of y axis
         # by subtracting them we get the length of y axis
-        MaxY = max(interfacing.ChannelLineArr[0].Amplitude)
-        MinY = min(interfacing.ChannelLineArr[0].Amplitude)
+        MaxY = self.MaxY
+        MinY = self.MinY
         MyRange = (MaxY-MinY)/5
         if self.HoldVarV == True:  # law al value bata3 al scroll at8yar dah ma3nah ano 3aiz maymshesh ma3a al line
             # len(interfacing.ChannelLineArr[0].Amplitude) will be replaced with number of points on the plot
@@ -544,7 +565,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def create_pdf(self):
         # the function that creates the pdf report
         pdname = QFileDialog.getSaveFileUrl(
-            None, str('Save the signal file'), None, str("PDF FIles(*.pdf)"))
+            None, str('Save the signal file'), str("PDF FIles(*.pdf)"))
         print(self.pdname[0])
 
         if pdname != '':
