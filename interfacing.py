@@ -58,7 +58,11 @@ def SetSelectedIndex(Input, Selector):
 class ChannelLine():
 
     def __init__(self, Label="Unlabeled", LineColour=0xFFFF00,
-                 IsHidden=False, Filepath="null", Time=[], Amplitude=[]):
+                 IsHidden=False, Filepath="null", Time=None, Amplitude=None):
+        if Time is None:
+            Time = []
+        if Amplitude is None:
+            Amplitude = []
         self.Label = "untitled"
         self.LineColour = 0xffff00
         self.IsHidden = IsHidden
