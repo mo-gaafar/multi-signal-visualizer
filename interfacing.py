@@ -158,7 +158,7 @@ def initConnectors(self):
     # Signal Colour Button
     self.SignalColour = self.findChild(QPushButton, "SignalColour")
     self.SignalColour.clicked.connect(
-        lambda: ChannelLineArr[SignalSelectedIndex].UpdateColour())
+        ChannelLineArr[SignalSelectedIndex].UpdateColour)
 
     # self.ShowHide = self.findChild(QCheckBox, "ShowHide")
     # self.ShowHide.stateChanged.connect(
@@ -188,26 +188,26 @@ def initConnectors(self):
     self.horizontalScrollBar = self.findChild(
         QScrollBar, "horizontalScrollBar")
     self.horizontalScrollBar.valueChanged.connect(
-        lambda: self.horizontalScrollBarFunction())
+        self.horizontalScrollBarFunction)
       
     self.horizontalScrollBar.sliderMoved.connect(
-        lambda: self.IsHeldH())
+        self.IsHeldH)
 
     self.horizontalScrollBar.sliderReleased.connect(
-        lambda: self.NotHeldH())
+        self.NotHeldH)
 
    #vertical
 
     self.verticalScrollBar = self.findChild(
         QScrollBar, "verticalScrollBar")
     self.verticalScrollBar.valueChanged.connect(
-        lambda: self.verticalScrollBarFunction())
+        self.verticalScrollBarFunction)
       
     self.verticalScrollBar.sliderMoved.connect(
-        lambda: self.IsHeldV())
+        self.IsHeldV)
 
     self.verticalScrollBar.sliderReleased.connect(
-        lambda: self.NotHeldV())
+        self.NotHeldV)
     # Cine speed slider
 
     self.SpeedSlider = self.findChild(QSlider, "SpeedSlider")
@@ -225,7 +225,7 @@ def initConnectors(self):
     self.EditLabel.returnPressed.connect(
         lambda: self.EditLabelFunction(self.EditLabel.text()))
     self.EditLabel.returnPressed.connect(
-        lambda: self.EditLabel.clear())
+        self.EditLabel.clear)
 
 def initSpectroRangeSliders(self):
     self.MinRangeSlider = self.findChild(QSlider, "MinRangeSlider")
