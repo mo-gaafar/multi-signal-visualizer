@@ -1,11 +1,6 @@
-from msilib.schema import Directory
-from re import A
-from tkinter import Label, dialog
-from tkinter.tix import DirSelectDialog
 from PyQt5 import QtWidgets, uic
 from PyQt5 import QtGui, QtCore, QtWidgets
-from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QTextEdit, QFileDialog, QScrollBar, QComboBox, QColorDialog, QCheckBox, QSlider
-from numpy.lib.index_tricks import IndexExpression
+from PyQt5.QtWidgets import QFileDialog, QColorDialog
 
 import pandas as pd
 from pyqtgraph import PlotWidget
@@ -13,24 +8,15 @@ import pyqtgraph as pg
 import sys
 import csv
 import os
-from random import randint
-
-from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as Canvas
 import scipy.io
 from scipy import signal
 import numpy as np
 import matplotlib.pyplot as plt
-import time
-
-from wfdb.io.record import rdrecord
 
 import pyqtgraph.exporters
-import pandas
-import statistics
 from PyQt5.QtWidgets import *
 from fpdf import FPDF
-from pyqtgraph.GraphicsScene import exportDialog
 # from PDF import PDF
 import pyqtgraph.exporters
 # import shutil

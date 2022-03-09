@@ -2,28 +2,12 @@
 # THIS FILE CONTAINS FUNCTION DEFENITIONS AND OBJECTS USED IN MAIN
 # IT WILL BE SPLIT INTO MORE LOGICAL MODULES IN THE FUTURE
 
-from asyncio.windows_events import NULL
 from main import DebugMode, MainWindow
-import string
-from PyQt5 import QtWidgets, uic
-from PyQt5 import QtGui, QtCore, QtWidgets
-from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QSlider, QTextEdit, QFileDialog, QScrollBar, QComboBox, QCheckBox, QScrollBar, QLCDNumber, QLineEdit
-# from pyparsing import null_debug_action
-
-import csv
-import math
-
-#from pyqtgraph import PlotWidget
-import pyqtgraph as pg
-import sys
-
-from matplotlib.figure import Figure
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as Canvas
+from PyQt5 import QtWidgets
+from PyQt5.QtWidgets import QPushButton, QSlider, QScrollBar, QComboBox, QCheckBox, QScrollBar, QLCDNumber, QLineEdit
 import scipy.io
-from scipy import signal
 import numpy as np
 import matplotlib.pyplot as plt
-import time
 
 ChannelLineArr = []
 

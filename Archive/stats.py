@@ -1,11 +1,7 @@
-from itertools import count
-import statistics
 from PyQt5.QtWidgets import * 
 
 import sys
 from PyQt5.QtWidgets import *
-
-from matplotlib import axes
 import pandas as pd
 import matplotlib.pyplot as plt
 
