@@ -6,7 +6,16 @@
 
 ## Libraries
 
-## Screenshots
+- PyQt5
+- pyqtgraph
+- fdpf
+- pandas
+- matplotlib
+- wfdb
+
+## Preview
+
+![](Design/previewvideo.mp4)
 
 ## Team Members
 
