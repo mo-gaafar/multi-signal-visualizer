@@ -15,7 +15,8 @@
 
 ## Preview
 
-![](https://www.loom.com/embed/aebe71b74f884c17b972e0784bf57d22)
+<video src="https://user-images.githubusercontent.com/46086535/157397108-b72a5ad8-a631-48c8-a1b6-cfaf0d665a34.mp4" controls="controls" style="max-width: 730px;">
+</video>
 
 ## Team Members
 
