@@ -3,7 +3,6 @@ import statistics
 from PyQt5.QtWidgets import * 
 
 import sys
-from PyQt5.QtWidgets import *
 
 from matplotlib import axes
 import pandas as pd

@@ -6,8 +6,8 @@ from asyncio.windows_events import NULL
 from main import DebugMode, MainWindow
 import string
 from PyQt5 import QtWidgets, uic
-from PyQt5 import QtGui, QtCore, QtWidgets
-from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QSlider, QTextEdit, QFileDialog, QScrollBar, QComboBox, QCheckBox, QScrollBar, QLCDNumber, QLineEdit
+from PyQt5 import QtGui, QtCore, 
+from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QSlider, QTextEdit, QFileDialog, QComboBox, QCheckBox, QScrollBar, QLCDNumber, QLineEdit
 # from pyparsing import null_debug_action
 
 import csv

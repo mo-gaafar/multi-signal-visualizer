@@ -3,7 +3,7 @@ from re import A
 from tkinter import Label, dialog
 from tkinter.tix import DirSelectDialog
 from PyQt5 import QtWidgets, uic
-from PyQt5 import QtGui, QtCore, QtWidgets
+from PyQt5 import QtGui, QtCore, 
 from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QTextEdit, QFileDialog, QScrollBar, QComboBox, QColorDialog, QCheckBox, QSlider
 from numpy.lib.index_tricks import IndexExpression
 
@@ -26,7 +26,6 @@ import time
 from wfdb.io.record import rdrecord
 
 import pyqtgraph.exporters
-import pandas
 import statistics
 from PyQt5.QtWidgets import *
 from fpdf import FPDF
