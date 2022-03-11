@@ -33,11 +33,6 @@ from fpdf import FPDF
 from pyqtgraph.GraphicsScene import exportDialog
 # from PDF import PDF
 import pyqtgraph.exporters
-# import shutil
-# import datetime
-# from PyQt5.QtGui import *
-# from PyQt5.QtCore import *
-# from PyQt5.QtWidgets import *
 
 import interfacing  # local module
 import wfdb
@@ -77,12 +72,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.HoldVarV = False
         self.xAxis = [0, 0, 0]
         self.yAxis = [0, 0, 0]
-        self.PlotWidget = []
-        for Index in range(3):
-            self.PlotWidget.append(PlotWidget())
 
-        self.LineReferenceArr = [self.Plot.plot(self.xAxis, self.yAxis), self.Plot.plot(
-            self.xAxis, self.yAxis), self.Plot.plot(self.xAxis, self.yAxis)]
+        self.LineReferenceArr = []
+        for Index in range(3):
+            self.LineReferenceArr.append(PlotWidget())
 
         # new Variables ABDULLAH
         self.amplitude = [[], [], []]
@@ -151,7 +144,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def plot_data(self):
 
         pen = pg.mkPen(color=(255, 255, 255))
-        self.PlotWidget[interfacing.SignalSelectedIndex] = self.Plot.plot(
+        self.LineReferenceArr[interfacing.SignalSelectedIndex] = self.Plot.plot(
             pen=interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].GetColour(), name="Channel " + str(interfacing.SignalSelectedIndex + 1))
         self.Plot.showGrid(x=True, y=True)
 
@@ -322,7 +315,7 @@ class MainWindow(QtWidgets.QMainWindow):
         MaxY = self.MaxY
         MinY = self.MinY
         MyRange = (MaxY-MinY)/5
-        # law al value bata3 al scroll at8yar dah ma3nah ano 3aiz maymshesh ma3a al line
+        # law al value beta3 al scroll et8ayar dah ma3nah ano 3aiz maymshesh ma3a al line
         if self.HoldVarV == True:
             # len(interfacing.ChannelLineArr[0].Amplitude) will be replaced with number of points on the plot
             if self.ValueVertical >= 0 and self.ValueVertical <= len(interfacing.ChannelLineArr[0].Amplitude)*(1/5):
@@ -360,7 +353,7 @@ class MainWindow(QtWidgets.QMainWindow):
         print(
             interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].Label)
         self.Legend.getLabel(
-            self.PlotWidget[interfacing.SignalSelectedIndex]).setText(Input)
+            self.LineReferenceArr[interfacing.SignalSelectedIndex]).setText(Input)
 
 #------------------------------------------------------SPECTROGRAM FUNCTIONS------------------------------------------------------------------------------------#
 
@@ -443,9 +436,9 @@ class MainWindow(QtWidgets.QMainWindow):
             QtWidgets.QMessageBox.warning(
                 self, 'NO SIGNAL ', 'You have to plot a signal first')
         else:
-            pdname = QFileDialog.getSaveFileName(
+            FolderPath = QFileDialog.getSaveFileName(
                 None, str('Save the signal file'), None, str("PDF FIles(*.pdf)"))
-            if pdname != '':
+            if FolderPath != '':
                 pdf = FPDF()
                 # set pdf title
                 pdf.add_page()
@@ -459,7 +452,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 pdf.ln(20)
             # create a CSV file of the signal
                 ex1 = pg.exporters.CSVExporter(self.Plot.plotItem)
-                ex1.export('test.csv')
+                ex1.export('temp.csv')
 
                 df = pd.read_csv('test.csv')
                 self.r = df.describe().loc[['mean', 'min']]
@@ -469,20 +462,20 @@ class MainWindow(QtWidgets.QMainWindow):
             #   print(self.E)
                 # pdf.cell(50, 10, self.E, 0, 0, 'C')
 
-        # create a excell sheet of the signal
+        # create an SVG of the signal
 
                 ex2 = pg.exporters.SVGExporter(self.Plot.plotItem)
-                ex2.export('test.svg')
+                ex2.export('temp.svg')
         # create a picture of the signal
                 ex3 = pg.exporters.ImageExporter(self.Plot.plotItem)
-                ex3.export('test.png')
+                ex3.export('temp.png')
         # put the picture of the signal in an array
-                self.list = ['test.png']
+                self.list = ['temp.png']
         # call the function create_pdf()
                 # put the graphs on the pdf
                 pdf.image('Desgin/CUFE.png', 1, 1, 50, 40)
                 pdf.image('Desgin/logo.png', 160, 1, 50, 40)
-                pdf.image('test.png', 40, 50, 150, 100)
+                pdf.image('temp.png', 40, 50, 150, 100)
                 pdf.image('Spectrogram.png', 40, 160, 120, 100)
                 #pdf.cell(30,10, df.describe().loc[['mean']],0,0,'c')
                 pdf.text(130, 270, 'Duration')
@@ -491,15 +484,15 @@ class MainWindow(QtWidgets.QMainWindow):
                 pdf.ln(10)
                 pdf.text(-50, 290, self.p.to_string())
 
-                pdf.output(str(pdname[0]))
-               # TODO zabtahaaaaaaaa
+                pdf.output(str(FolderPath[0]))
+
                 QtWidgets.QMessageBox.information(
                     self, 'Done', 'PDF has been created')
 
                 # deletes temporary files
-                os.remove("test.csv")
-                os.remove("test.png")
-                os.remove("test.svg")
+                os.remove("temp.csv")
+                os.remove("temp.png")
+                os.remove("temp.svg")
                 os.remove("Spectrogram.png")
 #------------------------------------------------------------------------------------------------------------------------------------------------------#
 
