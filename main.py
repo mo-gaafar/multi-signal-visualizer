@@ -33,9 +33,11 @@ from fpdf import FPDF
 from pyqtgraph.GraphicsScene import exportDialog
 # from PDF import PDF
 import pyqtgraph.exporters
-
-import interfacing  # local module
 import wfdb
+
+import classes  # local module
+import interface
+import utility as util
 
 
 plt.rcParams['axes.facecolor'] = 'black'
@@ -51,22 +53,28 @@ DebugMode = False  # Debug mode enables printing
 
 class MainWindow(QtWidgets.QMainWindow):
 
+    def initArrays(self):
+        for Index in range(3):
+            self.ChannelLineArr.append(classes.ChannelLine())
+            print(self.ChannelLineArr[Index])
+
     # Mainwindow constructor
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
-        uic.loadUi('mainwindow2.ui', self)
+        uic.loadUi('mainwindow.ui', self)
 
         self.setWindowIcon(QtGui.QIcon('icon.png'))
         # set the title
         self.setWindowTitle("Multi-Channel Signal Viewer")
 
         # Initialization functions
-        interfacing.initConnectors(self)
+        interface.initConnectors(self)
         # interfacing.initSpectroRangeSliders(self)
-        interfacing.initArrays(self)
+        self.ChannelLineArr = []
+        self.initArrays()
         self.CreateSpectrogramFigure()
 
-        self.PlotterWindowProp = interfacing.PlotterWindow()
+        self.PlotterWindowProp = classes.PlotterWindow()
         self.PauseToggleVar = False
         self.HoldVarH = False
         self.HoldVarV = False
@@ -90,7 +98,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.filename = QFileDialog.getOpenFileName(
             None, 'open the signal file', './', filter="Raw Data(*.csv *.txt *.xls *.hea *.dat *.rec)")
         path = self.filename[0]
-        interfacing.printDebug("Selected path: " + path)
+        util.printDebug("Selected path: " + path)
         self.OpenFile(path)
 
     def OpenFile(self, path: str):
@@ -106,7 +114,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
             # print(self.record.fs)
             self.fsampling = self.record.fs
-            interfacing.FreqRangeMax = self.fsampling/2
+            classes.FreqRangeMax = self.fsampling/2
             # print(TempArrY)
 
             for Index in range(len(TempArrY)):
@@ -121,21 +129,21 @@ class MainWindow(QtWidgets.QMainWindow):
                     TempArrX.append(
                         float(line[0]))
 
-        interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].Filepath = path
+        self.ChannelLineArr[classes.SignalSelectedIndex].Filepath = path
 
         # CHECKS IF CHANNEL 1 ISNT PLOTTED
-        if interfacing.ChannelLineArr[0].Filepath == "null":
+        if self.ChannelLineArr[0].Filepath == "null":
             QtWidgets.QMessageBox.warning(
                 self, 'CHANNEL 1 EMPTY ', 'PLEASE PLOT CHANNEL 1 FIRST')
-            interfacing.ChannelLineArr[0].Amplitude = TempArrY
-            interfacing.ChannelLineArr[0].Time = TempArrX
+            self.ChannelLineArr[0].Amplitude = TempArrY
+            self.ChannelLineArr[0].Time = TempArrX
 
         else:
-            interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].Amplitude = TempArrY
-            interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].Time = TempArrX
+            self.ChannelLineArr[classes.SignalSelectedIndex].Amplitude = TempArrY
+            self.ChannelLineArr[classes.SignalSelectedIndex].Time = TempArrX
 
         self.Legend = self.Plot.addLegend()
-        interfacing.initSpectroRangeSliders(self)
+        classes.initSpectroRangeSliders(self)
 
         self.plotSpectro()
 
@@ -144,12 +152,12 @@ class MainWindow(QtWidgets.QMainWindow):
     def plot_data(self):
 
         pen = pg.mkPen(color=(255, 255, 255))
-        interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].PlotWidgetReference = self.Plot.plot(
-            pen=interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].GetColour(), name="Channel " + str(interfacing.SignalSelectedIndex + 1))
+        self.ChannelLineArr[classes.SignalSelectedIndex].PlotWidgetReference = self.Plot.plot(
+            pen=self.ChannelLineArr[classes.SignalSelectedIndex].GetColour(), name="Channel " + str(classes.SignalSelectedIndex + 1))
         self.Plot.showGrid(x=True, y=True)
 
-        self.MinSignalLen = len(interfacing.ChannelLineArr[0].Amplitude)
-        interfacing.printDebug(
+        self.MinSignalLen = len(self.ChannelLineArr[0].Amplitude)
+        util.printDebug(
             "Max length of x plots is: " + str(self.MinSignalLen))
         self.pointsToAppend = 0
 
@@ -161,20 +169,20 @@ class MainWindow(QtWidgets.QMainWindow):
         MinY = 0
 
         for Index in range(3):  # TODO: make range variable later
-            if len(interfacing.ChannelLineArr[Index].Time) != 0 and len(interfacing.ChannelLineArr[Index].Time) > MaxX:
-                MaxX = len(interfacing.ChannelLineArr[Index].Time)
+            if len(self.ChannelLineArr[Index].Time) != 0 and len(self.ChannelLineArr[Index].Time) > MaxX:
+                MaxX = len(self.ChannelLineArr[Index].Time)
 
-            if len(interfacing.ChannelLineArr[Index].Amplitude) != 0 and max(interfacing.ChannelLineArr[Index].Amplitude) > MaxY:
-                MaxY = max(interfacing.ChannelLineArr[Index].Amplitude)
+            if len(self.ChannelLineArr[Index].Amplitude) != 0 and max(self.ChannelLineArr[Index].Amplitude) > MaxY:
+                MaxY = max(self.ChannelLineArr[Index].Amplitude)
 
-            if len(interfacing.ChannelLineArr[Index].Time) != 0 and len(interfacing.ChannelLineArr[Index].Time) < MinX:
-                MinX = len(interfacing.ChannelLineArr[Index].Time)
+            if len(self.ChannelLineArr[Index].Time) != 0 and len(self.ChannelLineArr[Index].Time) < MinX:
+                MinX = len(self.ChannelLineArr[Index].Time)
 
-            if len(interfacing.ChannelLineArr[Index].Amplitude) != 0 and min(interfacing.ChannelLineArr[Index].Amplitude) < MinY:
-                MinY = min(interfacing.ChannelLineArr[Index].Amplitude)
+            if len(self.ChannelLineArr[Index].Amplitude) != 0 and min(self.ChannelLineArr[Index].Amplitude) < MinY:
+                MinY = min(self.ChannelLineArr[Index].Amplitude)
 
         # MinY = -1  # Placeholder
-        interfacing.printDebug("MaxX: " + str(MaxX))
+        util.printDebug("MaxX: " + str(MaxX))
 
         self.Plot.plotItem.setLimits(
             xMin=MinX, xMax=MaxX, yMin=MinY, yMax=MaxY)
@@ -195,15 +203,15 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.timer.setInterval(self.PlotterWindowProp.CineSpeed)
 
-        for ChannelIndex in range(len(interfacing.ChannelLineArr)):
+        for ChannelIndex in range(len(self.ChannelLineArr)):
             # checks if signal has information to be plotted
             # Check if channel contains data (TODO: change this later to a bool)
-            if interfacing.ChannelLineArr[ChannelIndex].Filepath != "null":
+            if self.ChannelLineArr[ChannelIndex].Filepath != "null":
 
                 # Index of channels containing files
                 # self.FilledChannels.append(ChannelIndex)
-                self.xAxis[ChannelIndex] = interfacing.ChannelLineArr[ChannelIndex].Time[:self.pointsToAppend]
-                self.yAxis[ChannelIndex] = interfacing.ChannelLineArr[ChannelIndex].Amplitude[:self.pointsToAppend]
+                self.xAxis[ChannelIndex] = self.ChannelLineArr[ChannelIndex].Time[:self.pointsToAppend]
+                self.yAxis[ChannelIndex] = self.ChannelLineArr[ChannelIndex].Amplitude[:self.pointsToAppend]
 
         self.pointsToAppend += 5
 
@@ -217,12 +225,12 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Plots all signals
         for Index in range(3):  # TODO: make this variable later.;
-            if interfacing.ChannelLineArr[Index].Filepath != "null" and len(interfacing.ChannelLineArr[Index].Time) > self.pointsToAppend:
+            if self.ChannelLineArr[Index].Filepath != "null" and len(self.ChannelLineArr[Index].Time) > self.pointsToAppend:
                 # TODO: signal should be time indexed
                 # self.PlotWidget.setData(
-                # self.xAxis[0], self.yAxis[Index], pen=interfacing.ChannelLineArr[Index].GetColour(), skipFiniteCheck=True)
-                interfacing.ChannelLineArr[Index].PlotWidgetReference.setData(
-                    self.xAxis[0], self.yAxis[Index], pen=interfacing.ChannelLineArr[Index].GetColour(), name="name")
+                # self.xAxis[0], self.yAxis[Index], pen=self.ChannelLineArr[Index].GetColour(), skipFiniteCheck=True)
+                self.ChannelLineArr[Index].PlotWidgetReference.setData(
+                    self.xAxis[0], self.yAxis[Index], pen=self.ChannelLineArr[Index].GetColour(), name="name")
 
 
 #-----------------------------------------------------------------------------------------------------------------------------------------------#
@@ -231,33 +239,34 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def DynamicUpdate(self):
         for Index in range(3):  # TODO: make this variable later
-            if interfacing.ChannelLineArr[Index].Filepath != "null" and len(interfacing.ChannelLineArr[Index].Time) > self.pointsToAppend:
-                if interfacing.ChannelLineArr[Index].IsHidden == True:
-                    interfacing.ChannelLineArr[Index].PlotWidgetReference.hide(
+            if self.ChannelLineArr[Index].Filepath != "null" and len(self.ChannelLineArr[Index].Time) > self.pointsToAppend:
+                if self.ChannelLineArr[Index].IsHidden == True:
+                    self.ChannelLineArr[Index].PlotWidgetReference.hide(
                     )
                 else:
-                    interfacing.ChannelLineArr[Index].PlotWidgetReference.show(
+                    self.ChannelLineArr[Index].PlotWidgetReference.show(
                     )
 
-                interfacing.ChannelLineArr[Index].PlotWidgetReference.setData(
-                    self.xAxis[0], self.yAxis[Index], pen=interfacing.ChannelLineArr[Index].GetColour(), name=interfacing.ChannelLineArr[Index].Label, skipFiniteCheck=True)
+                self.ChannelLineArr[Index].PlotWidgetReference.setData(
+                    self.xAxis[0], self.yAxis[Index], pen=self.ChannelLineArr[Index].GetColour(), name=self.ChannelLineArr[Index].Label, skipFiniteCheck=True)
 
     def SelectSignalColour(self):
-        self.SignalColour = QColorDialog.getColor().name()
-        return self.SignalColour
+        self.ChannelLineArr[classes.SignalSelectedIndex].UpdateColour(
+            QColorDialog.getColor().name())
+        self.DynamicUpdate()
 
     def ZoomInFunction(self):
         self.timer.stop()  # Stopping the signal in order to view a specific point
         # setting the toggle to true in order to press play to continue plotting
         self.PauseToggleVar = True
         self.Plot.plotItem.getViewBox().scaleBy((0.5, 0.5))
-        interfacing.printDebug("Zoomin")
+        util.printDebug("Zoomin")
 
     def ZoomOutFunction(self):
         self.timer.stop()
         self.PauseToggleVar = True
         self.Plot.plotItem.getViewBox().scaleBy((1.5, 1.5))
-        interfacing.printDebug("Zoomout")
+        util.printDebug("Zoomout")
 
     def TogglePause(self):
         self.PauseToggleVar = not self.PauseToggleVar  # On click, toggle state
@@ -266,11 +275,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
         else:
             self.timer.start()
-        interfacing.printDebug("PauseToggle")
+        util.printDebug("PauseToggle")
         # self.DynamicUpdate()
 
     def ToggleHide(self, Checked):
-        interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].IsHidden = Checked
+        self.ChannelLineArr[classes.SignalSelectedIndex].IsHidden = Checked
         self.DynamicUpdate()
 
     def IsHeldH(self):
@@ -291,7 +300,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         if self.HoldVarH == True and self.ValueHorizontal <= self.pointsToAppend:
             self.Plot.plotItem.setXRange(
-                interfacing.ChannelLineArr[0].Time[self.ValueHorizontal]-1.0, interfacing.ChannelLineArr[0].Time[self.ValueHorizontal])
+                self.ChannelLineArr[0].Time[self.ValueHorizontal]-1.0, self.ChannelLineArr[0].Time[self.ValueHorizontal])
         else:
             self.Plot.plotItem.setXRange(
                 max(self.xAxis[0], default=0)-1.0, max(self.xAxis[0], default=0))
@@ -299,18 +308,18 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.horizontalScrollBar.setMinimum(0)
         self.horizontalScrollBar.setMaximum(
-            len(interfacing.ChannelLineArr[0].Time))
+            len(self.ChannelLineArr[0].Time))
         self.horizontalScrollBar.setSingleStep(20)
 
-        interfacing.printDebug("Horizontal Scroll: " +
-                               str(self.ValueHorizontal))
+        util.printDebug("Horizontal Scroll: " +
+                        str(self.ValueHorizontal))
 
     def verticalScrollBarFunction(self):
         self.ValueVertical = self.verticalScrollBar.value()
 
         self.verticalScrollBar.setMinimum(0)
         self.verticalScrollBar.setMaximum(
-            len(interfacing.ChannelLineArr[0].Amplitude))
+            len(self.ChannelLineArr[0].Amplitude))
         self.verticalScrollBar.setSingleStep(20)
         # TODO: after Setting limits based on all plottable signals
         # we will have the max and min of y axis
@@ -320,19 +329,19 @@ class MainWindow(QtWidgets.QMainWindow):
         MyRange = (MaxY-MinY)/5
         # law al value beta3 al scroll et8ayar dah ma3nah ano 3aiz maymshesh ma3a al line
         if self.HoldVarV == True:
-            # len(interfacing.ChannelLineArr[0].Amplitude) will be replaced with number of points on the plot
-            if self.ValueVertical >= 0 and self.ValueVertical <= len(interfacing.ChannelLineArr[0].Amplitude)*(1/5):
+            # len(self.ChannelLineArr[0].Amplitude) will be replaced with number of points on the plot
+            if self.ValueVertical >= 0 and self.ValueVertical <= len(self.ChannelLineArr[0].Amplitude)*(1/5):
                 # in order to get the max number of values
                 # TAKECARE:hasabat al range hena (n)
                 self.Plot.plotItem.setYRange(MaxY-MyRange, MaxY)
-            elif self.ValueVertical >= len(interfacing.ChannelLineArr[0].Amplitude)*(1/5) and self.ValueVertical <= len(interfacing.ChannelLineArr[0].Amplitude)*(2/5):
+            elif self.ValueVertical >= len(self.ChannelLineArr[0].Amplitude)*(1/5) and self.ValueVertical <= len(self.ChannelLineArr[0].Amplitude)*(2/5):
 
                 self.Plot.plotItem.setYRange(MaxY-MyRange*2, MaxY-MyRange)
 
-            elif self.ValueVertical >= len(interfacing.ChannelLineArr[0].Amplitude)*(2/5) and self.ValueVertical <= len(interfacing.ChannelLineArr[0].Amplitude)*(3/5):
+            elif self.ValueVertical >= len(self.ChannelLineArr[0].Amplitude)*(2/5) and self.ValueVertical <= len(self.ChannelLineArr[0].Amplitude)*(3/5):
                 self.Plot.plotItem.setYRange(MaxY-MyRange*3, MaxY-MyRange*2)
 
-            elif self.ValueVertical >= len(interfacing.ChannelLineArr[0].Amplitude)*(3/5) and self.ValueVertical <= len(interfacing.ChannelLineArr[0].Amplitude)*(4/5):
+            elif self.ValueVertical >= len(self.ChannelLineArr[0].Amplitude)*(3/5) and self.ValueVertical <= len(self.ChannelLineArr[0].Amplitude)*(4/5):
                 self.Plot.plotItem.setYRange(MaxY-MyRange*4, MaxY-MyRange*3)
             else:
                 self.Plot.plotItem.setYRange(MinY, MaxY-MyRange*4)
@@ -343,20 +352,20 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ValueVertical = self.verticalScrollBar.setValue(
                 0)  # at amplitude=0
 
-        interfacing.printDebug("Vertical Scroll: " + str(self.ValueVertical))
+        util.printDebug("Vertical Scroll: " + str(self.ValueVertical))
 
     def SpeedSliderFunction(self, Input):
         self.ValueCineSpeed = Input
-        interfacing.printDebug("Speed Slider: " + str(self.ValueCineSpeed))
+        util.printDebug("Speed Slider: " + str(self.ValueCineSpeed))
         self.PlotterWindowProp.UpdateCineSpeed(Input)
         return self.ValueCineSpeed
 
     def EditLabelFunction(self, Input):
-        interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].Label = Input
+        self.ChannelLineArr[classes.SignalSelectedIndex].Label = Input
         print(
-            interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].Label)
+            self.ChannelLineArr[classes.SignalSelectedIndex].Label)
         self.Legend.getLabel(
-            interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].PlotWidgetReference).setText(Input)
+            self.ChannelLineArr[classes.SignalSelectedIndex].PlotWidgetReference).setText(Input)
 
 #------------------------------------------------------SPECTROGRAM FUNCTIONS------------------------------------------------------------------------------------#
 
@@ -372,7 +381,7 @@ class MainWindow(QtWidgets.QMainWindow):
         FS = 250
 
         # Corner Case Of Empty Channel
-        if len(interfacing.ChannelLineArr[interfacing.SpectroSelectedIndex].Amplitude) == 0:
+        if len(self.ChannelLineArr[classes.SpectroSelectedIndex].Amplitude) == 0:
             self.axes.clear()
             self.Spectrogram.draw()
             self.figure.canvas.draw()
@@ -382,7 +391,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 FS = self.fsampling
 
             self.SignalArray = np.array(
-                interfacing.ChannelLineArr[interfacing.SpectroSelectedIndex].Amplitude)
+                self.ChannelLineArr[classes.SpectroSelectedIndex].Amplitude)
             self.freq, self.time, self.Sxx = signal.spectrogram(
                 self.SignalArray, fs=FS, window='hanning', nperseg=128, noverlap=64, detrend=False, mode='magnitude', scaling='density')
 
@@ -390,14 +399,14 @@ class MainWindow(QtWidgets.QMainWindow):
             self.axes.set_ylim([0, self.max_freq])
 
             # Slices freq arr into range specified by sliders
-            self.freqRange = np.where((self.freq >= interfacing.FreqRangeMin) & (
-                self.freq <= interfacing.FreqRangeMax))
+            self.freqRange = np.where((self.freq >= classes.FreqRangeMin) & (
+                self.freq <= classes.FreqRangeMax))
             self.freq = self.freq[self.freqRange]
             self.Sxx = self.Sxx[self.freqRange, :][0]
 
             # Plots Spectrogram
             self.axes.pcolormesh(
-                self.time, self.freq, 10*np.log10(self.Sxx), cmap=interfacing.SpectroTheme)
+                self.time, self.freq, 10*np.log10(self.Sxx), cmap=classes.SpectroTheme)
             self.axes.set_ylabel('Frequency [Hz]', color='white')
             self.axes.set_xlabel('Time [s]', color='white')
             self.axes.set_yscale('symlog')
@@ -408,29 +417,29 @@ class MainWindow(QtWidgets.QMainWindow):
             plt.savefig('Spectrogram.png')
 
     def SetSpectroSelectedIndex(self, Input):
-        interfacing.SpectroSelectedIndex = Input
+        classes.SpectroSelectedIndex = Input
         self.plotSpectro()
 
     def SetSpectroTheme(self, Input):
-        interfacing.SpectroTheme = Input
+        classes.SpectroTheme = Input
         self.plotSpectro()
 
     def SpectrogramFrequency(self, Input, MinOrMax):
         if MinOrMax == "min":
-            if Input < interfacing.FreqRangeMax:
-                interfacing.FreqRangeMin = Input
+            if Input < classes.FreqRangeMax:
+                classes.FreqRangeMin = Input
             else:
                 # Prevents min from exceeding max
-                self.MinRangeSlider.setValue(interfacing.FreqRangeMin)
+                self.MinRangeSlider.setValue(classes.FreqRangeMin)
         if MinOrMax == "max":
-            if Input > interfacing.FreqRangeMin:
-                interfacing.FreqRangeMax = Input
+            if Input > classes.FreqRangeMin:
+                classes.FreqRangeMax = Input
             else:
                 # Prevents max from going below min
-                self.MaxRangeSlider.setValue(interfacing.FreqRangeMax)
+                self.MaxRangeSlider.setValue(classes.FreqRangeMax)
 
         self.plotSpectro()
-        interfacing.printDebug(MinOrMax + "SpectroSlider: " + str(Input))
+        util.printDebug(MinOrMax + "SpectroSlider: " + str(Input))
 #--------------------------------------------------------RXPORT FUNCTION---------------------------------------------------------------------------#
 
     def ExportPDF(self):
@@ -457,7 +466,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 ex1 = pg.exporters.CSVExporter(self.Plot.plotItem)
                 ex1.export('temp.csv')
 
-                df = pd.read_csv('test.csv')
+                df = pd.read_csv('temp.csv')
                 self.r = df.describe().loc[['mean', 'min']]
                 self.p = df.describe().loc[['max', 'std']]
 
