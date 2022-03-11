@@ -73,9 +73,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.xAxis = [0, 0, 0]
         self.yAxis = [0, 0, 0]
 
-        self.LineReferenceArr = []
-        for Index in range(3):
-            self.LineReferenceArr.append(PlotWidget())
+        # self.LineReferenceArr = []
+        # for Index in range(3):
+        #     self.LineReferenceArr.append(PlotWidget())
 
         # new Variables ABDULLAH
         self.amplitude = [[], [], []]
@@ -144,7 +144,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def plot_data(self):
 
         pen = pg.mkPen(color=(255, 255, 255))
-        self.LineReferenceArr[interfacing.SignalSelectedIndex] = self.Plot.plot(
+        interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].PlotWidgetReference = self.Plot.plot(
             pen=interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].GetColour(), name="Channel " + str(interfacing.SignalSelectedIndex + 1))
         self.Plot.showGrid(x=True, y=True)
 
@@ -221,22 +221,25 @@ class MainWindow(QtWidgets.QMainWindow):
                 # TODO: signal should be time indexed
                 # self.PlotWidget.setData(
                 # self.xAxis[0], self.yAxis[Index], pen=interfacing.ChannelLineArr[Index].GetColour(), skipFiniteCheck=True)
-                self.LineReferenceArr[Index].setData(
+                interfacing.ChannelLineArr[Index].PlotWidgetReference.setData(
                     self.xAxis[0], self.yAxis[Index], pen=interfacing.ChannelLineArr[Index].GetColour(), name="name")
 
 
 #-----------------------------------------------------------------------------------------------------------------------------------------------#
     # OPENS COLOUR DIALOG WHEN BUTTON IS PRESSED
 
+
     def DynamicUpdate(self):
         for Index in range(3):  # TODO: make this variable later
             if interfacing.ChannelLineArr[Index].Filepath != "null" and len(interfacing.ChannelLineArr[Index].Time) > self.pointsToAppend:
                 if interfacing.ChannelLineArr[Index].IsHidden == True:
-                    self.LineReferenceArr[Index].hide()
+                    interfacing.ChannelLineArr[Index].PlotWidgetReference.hide(
+                    )
                 else:
-                    self.LineReferenceArr[Index].show()
+                    interfacing.ChannelLineArr[Index].PlotWidgetReference.show(
+                    )
 
-                self.LineReferenceArr[Index].setData(
+                interfacing.ChannelLineArr[Index].PlotWidgetReference.setData(
                     self.xAxis[0], self.yAxis[Index], pen=interfacing.ChannelLineArr[Index].GetColour(), name=interfacing.ChannelLineArr[Index].Label, skipFiniteCheck=True)
 
     def SelectSignalColour(self):
@@ -353,7 +356,7 @@ class MainWindow(QtWidgets.QMainWindow):
         print(
             interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].Label)
         self.Legend.getLabel(
-            self.LineReferenceArr[interfacing.SignalSelectedIndex]).setText(Input)
+            interfacing.ChannelLineArr[interfacing.SignalSelectedIndex].PlotWidgetReference).setText(Input)
 
 #------------------------------------------------------SPECTROGRAM FUNCTIONS------------------------------------------------------------------------------------#
 

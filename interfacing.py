@@ -15,6 +15,7 @@ import math
 
 #from pyqtgraph import PlotWidget
 import pyqtgraph as pg
+from pyqtgraph import PlotWidget
 import sys
 
 from matplotlib.figure import Figure
@@ -67,6 +68,7 @@ class ChannelLine():
         self.Amplitude = []
         self.TimeArrFull = np.array([])
         self.AmplitudeArrFull = np.array([])
+        self.PlotWidgetReference = PlotWidget()
 
     def UpdateColour(self):
         # self.LineColour =
@@ -189,20 +191,20 @@ def initConnectors(self):
         QScrollBar, "horizontalScrollBar")
     self.horizontalScrollBar.valueChanged.connect(
         lambda: self.horizontalScrollBarFunction())
-      
+
     self.horizontalScrollBar.sliderMoved.connect(
         lambda: self.IsHeldH())
 
     self.horizontalScrollBar.sliderReleased.connect(
         lambda: self.NotHeldH())
 
-   #vertical
+   # vertical
 
     self.verticalScrollBar = self.findChild(
         QScrollBar, "verticalScrollBar")
     self.verticalScrollBar.valueChanged.connect(
         lambda: self.verticalScrollBarFunction())
-      
+
     self.verticalScrollBar.sliderMoved.connect(
         lambda: self.IsHeldV())
 
@@ -226,6 +228,7 @@ def initConnectors(self):
         lambda: self.EditLabelFunction(self.EditLabel.text()))
     self.EditLabel.returnPressed.connect(
         lambda: self.EditLabel.clear())
+
 
 def initSpectroRangeSliders(self):
     self.MinRangeSlider = self.findChild(QSlider, "MinRangeSlider")
