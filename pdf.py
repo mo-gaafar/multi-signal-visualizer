@@ -7,70 +7,111 @@ import pyqtgraph as pg
 import pandas as pd
 import statistics
 import os
-
+import numpy as np
 # the function that creates the pdf report
 
 
 def Exporter(self):
-        if self.pointsToAppend == 0:
-            QtWidgets.QMessageBox.warning(
-                self, 'NO SIGNAL ', 'You have to plot a signal first')
-        else:
-            FolderPath = QFileDialog.getSaveFileName(
-                None, str('Save the signal file'), None, str("PDF FIles(*.pdf)"))
+        # if self.pointsToAppend == 0:
+        #     # This message appears if there is no signal to EXPORT
+        #     QtWidgets.QMessageBox.warning( self, 'NO SIGNAL ', 'You have to plot a signal first')
+        # else:
+            FolderPath = QFileDialog.getSaveFileName( None, str('Save the signal file'), None, str("PDF FIles(*.pdf)"))
             if FolderPath != '':
                 pdf = FPDF()
-                # set pdf title
+                
+                # Add new page. Without this you cannot create the document
                 pdf.add_page()
-                pdf.set_font('Arial', 'B', 17)
+
+                # Style of the pdf
+                #pdf.set_font('ZapfDingbats','B',20)
+                pdf.set_font('Arial','B',20)
                 pdf.cell(70)
-
                 pdf.cell(50, 10, 'Signal Viewer Report', 0, 0, 'C')
-                pdf.ln(5)
-            # pdf.cell(60, 10, 'Abdullah', 0, 0, 'L')
 
-                pdf.ln(20)
-            # create a CSV file of the signal
-                ex1 = pg.exporters.CSVExporter(self.Plot.plotItem)
-                ex1.export('temp.csv')
-
-                df = pd.read_csv('temp.csv')
-                self.r = df.describe().loc[['mean', 'min']]
-                self.p = df.describe().loc[['max', 'std']]
-
-                self.E = df.describe()
-            #   print(self.E)
-                # pdf.cell(50, 10, self.E, 0, 0, 'C')
-
-        # create an SVG of the signal
-
-                ex2 = pg.exporters.SVGExporter(self.Plot.plotItem)
-                ex2.export('temp.svg')
-        # create a picture of the signal
+                #create a picture of the signal
                 ex3 = pg.exporters.ImageExporter(self.Plot.plotItem)
-                ex3.export('temp.png')
-        # put the picture of the signal in an array
-                self.list = ['temp.png']
-        # call the function create_pdf()
-                # put the graphs on the pdf
+                ex3.export('plot.png')
+
+                # insert the logos
                 pdf.image('Desgin/CUFE.png', 1, 1, 50, 40)
                 pdf.image('Desgin/logo.png', 160, 1, 50, 40)
-                pdf.image('temp.png', 40, 50, 150, 100)
-                pdf.image('Spectrogram.png', 40, 160, 120, 100)
-                # pdf.cell(30,10, df.describe().loc[['mean']],0,0,'c')
-                pdf.text(130, 270, 'Duration')
-                pdf.text(160, 270, str(max(self.xAxis[0])))
-                pdf.text(-52, 270, self.r.to_string())
-                pdf.ln(10)
-                pdf.text(-50, 290, self.p.to_string())
+                
+                # insert the plot graph and the specrogram
+                pdf.image('plot.png', 40, 50, 150, 100)
+                pdf.image('Spectrogram.png', 55, 160, 120, 100)
 
+                
+                # Adding new page for the table
+                pdf.add_page()
+
+                pdf.set_font('Times','',10.0) 
+
+
+                # Effective page width, or just epw
+                epw = pdf.w - 2*pdf.l_margin
+
+                #distribute the table on 6 columes
+                column_width = epw/6
+                
+                #declare an array of the arrays.  Also we declared the size 
+                data = [['','Max','Min','Mean','Std_Dev','Duration'],[],[],[]]
+                
+                #This loop to draw the rest of the rows and to get the varibles to fill the table
+                for index in range (3):
+                    if self.ChannelLineArr[index].Filepath != "null":
+                        data[index+1].append('Channel '+ str(index + 1))
+                        data[index+1].append(round(np.amax(self.ChannelLineArr[index].Amplitude),4))
+                        data[index+1].append(round(np.amin(self.ChannelLineArr[index].Amplitude),4))
+                        data[index+1].append(round(np.mean(self.ChannelLineArr[index].Amplitude),4))
+                        data[index+1].append(round(np.std(self.ChannelLineArr[index].Amplitude),4))
+                        data[index+1].append(round(np.amax(self.ChannelLineArr[index].Time),4))
+
+                # Document title centered, 'B'old, 14 pt
+                pdf.set_font('Times','B',20.0) 
+                pdf.cell(epw, 0.0, 'Statistics data', align='C')
+                pdf.set_font('Times','',10.0) 
+                pdf.ln(20)
+
+                # Text height is the same as current font size
+                text_height = pdf.font_size
+
+                # This 2 loops draw the Table
+                for row in data:
+                    for datum in row:
+                        
+                        #This condition to select the first column 
+                        if datum == row[0]:
+                            # Set the color of the first column    
+                            pdf.set_fill_color(200,200,200)
+                            # Draw the first column
+                            pdf.cell(column_width, 3*text_height, str(datum), border=1, fill=True)
+        
+                        #This condition to select the first row
+                        elif row == data[0]:
+                            # Set the color of the first row    
+                            pdf.set_fill_color(200,200,200)
+                            # Draw the first row
+                            pdf.cell(column_width, 3*text_height, str(datum), border=1, fill=True)
+                        else:
+                            pdf.cell(column_width, 3*text_height, str(datum), border=1)
+                            
+                # Line break equivalent to 3 lines
+                pdf.ln(3*text_height)
+                
+                #Exporting the Pdf
                 pdf.output(str(FolderPath[0]))
+              
+               # This message appears when the pdf EXPORTED
+                QtWidgets.QMessageBox.information( self, 'Done', 'PDF has been created')
+               
+              
+              
+               
 
-                QtWidgets.QMessageBox.information(
-                    self, 'Done', 'PDF has been created')
 
-                # deletes temporary files
-                os.remove("temp.csv")
-                os.remove("temp.png")
-                os.remove("temp.svg")
-                os.remove("Spectrogram.png")
+                
+
+    
+    
+    #  pdf.SetAutoPageBreak(boolean auto [, float margin])
