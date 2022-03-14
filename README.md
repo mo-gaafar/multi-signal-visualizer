@@ -16,7 +16,6 @@ csv, txt, xls, hea, dat, rec
 - PyQt5
 - pyqtgraph
 - fdpf
-- pandas
 - matplotlib
 - wfdb
 
