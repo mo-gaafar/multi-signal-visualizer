@@ -68,6 +68,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.initArrays()
         self.CreateSpectrogramFigure()
 
+        self.pointsToAppend = 0
         self.PlotterWindowProp = classes.PlotterWindow()
         self.PauseToggleVar = False
         self.HoldVarH = False
