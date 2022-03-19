@@ -352,7 +352,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.SpectrogramBox_2.addWidget(self.Spectrogram)
 
     def plotSpectro(self):
-
+        
+        self.axes.clear()
         FS = 250
 
         # Corner Case Of Empty Channel
