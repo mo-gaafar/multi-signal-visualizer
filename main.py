@@ -1,4 +1,4 @@
-from msilib.schema import Directory
+# from msilib.schema import Directory
 from re import A
 from PyQt5 import QtWidgets, uic
 from PyQt5 import QtGui, QtCore, QtWidgets
@@ -24,7 +24,7 @@ from wfdb.io.record import rdrecord
 
 
 from PyQt5.QtWidgets import *
-from fpdf import FPDF
+# from fpdf import FPDF
 import wfdb
 
 # LOCAL MODULES
@@ -96,7 +96,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
             # print(self.record.fs)
             self.fsampling = self.record.fs
-            classes.FreqRangeMax = self.fsampling/2
+            classes.FreqRangeMax = int(round(self.fsampling/2))
             # print(TempArrY)
 
             for Index in range(len(TempArrY)):
@@ -183,7 +183,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def update_plot_data(self):
 
-        self.timer.setInterval(self.PlotterWindowProp.CineSpeed)
+        self.timer.setInterval(int(round(self.PlotterWindowProp.CineSpeed)))
 
         for ChannelIndex in range(len(self.ChannelLineArr)):
             # checks if signal has information to be plotted
@@ -369,7 +369,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.SignalArray = np.array(
                 self.ChannelLineArr[classes.SpectroSelectedIndex].Amplitude)
             self.freq, self.time, self.Sxx = signal.spectrogram(
-                self.SignalArray, fs=FS, window='hanning', nperseg=128, noverlap=64, detrend=False, mode='magnitude', scaling='density')
+                self.SignalArray, fs=FS, window='hamming', nperseg=128, noverlap=64, detrend=False, mode='magnitude', scaling='density')
 
             self.max_freq = np.max(self.freq)
             self.axes.set_ylim([0, self.max_freq])

@@ -2,7 +2,7 @@
 # THIS FILE CONTAINS FUNCTION DEFENITIONS AND OBJECTS USED IN MAIN
 # IT WILL BE SPLIT INTO MORE LOGICAL MODULES IN THE FUTURE
 
-from asyncio.windows_events import NULL
+# from asyncio.windows_events import NULL
 from main import DebugMode, MainWindow
 import string
 from PyQt5 import QtWidgets, uic
@@ -25,7 +25,7 @@ import utility as util
 # Global Interface Variables
 LabelTextBox = "null"
 FreqRangeMin = 0
-FreqRangeMax = 250
+FreqRangeMax = int(250)
 
 
 # TODO: add themes here somehow? create theme object or dictionary?
@@ -89,7 +89,7 @@ class PlotterWindow:
 
     def UpdateCineSpeed(self, Input):
         self.CineSpeed = (50) / (Input/100)
-        #MainWindow.timer = QtCore.QTimer()
+        # MainWindow.timer = QtCore.QTimer()
         # MainWindow.timer.setInterval(100*self.CineSpeed)
 
 
